@@ -1,0 +1,42 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
+import { pageHead } from "@/data/demo";
+export const Route = createFileRoute("/about")({
+  head: () =>
+    pageHead(
+      "О проекте",
+      "Иронкарта — карта осетинских фамилий, которая помогает сохранять связь с родными местами.",
+    ),
+  component: About,
+});
+function About() {
+  return (
+    <main className="page-main">
+      <article className="prose-page">
+        <div className="eyebrow">Из Осетии. С любовью.</div>
+        <h1>Иронкарта</h1>
+        <p>
+          Мы живём в разных странах, говорим на разных языках и выбираем разные дороги. Но связь с
+          родными местами и своими людьми остаётся с нами.
+        </p>
+        <h2>Разные города. Одни корни.</h2>
+        <p>
+          Иронкарта задумана как место встречи: карта осетинских фамилий, семейные истории и
+          возможность найти своих по всему миру.
+        </p>
+        <h2>Бережно к личному</h2>
+        <p>
+          На карте — только фамилия и город, без точных адресов. Отметка предполагает согласие её
+          участника.
+        </p>
+        <div className="demo-notice">
+          Сейчас это первый, демонстрационный этап проекта. Отметки вымышлены; формы не сохраняют и
+          не публикуют данные.
+        </div>
+        <Link to="/" className="text-link">
+          Вернуться к карте <ArrowRight />
+        </Link>
+      </article>
+    </main>
+  );
+}

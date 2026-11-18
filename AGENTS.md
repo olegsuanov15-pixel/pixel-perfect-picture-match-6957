@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+<!-- AGENT-MEMORY:BEGIN -->
+- Keep the first-stage experience frontend-only with explicit demo data and non-persisting forms, so design review does not publish personal information.
+- Share the header, mountain artwork and footer in the root shell; use separate content routes with individual metadata for discoverable navigation.
+- Render the demonstration world map from simplified Natural Earth geometry and CSS-positioned markers, so it needs no map credentials or external tile requests.
+<!-- AGENT-MEMORY:END -->

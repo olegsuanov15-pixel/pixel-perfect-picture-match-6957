@@ -11,6 +11,8 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
+import { SiteHeader, SiteFooter } from "@/components/ironkarta/site-shell";
+import panorama from "@/assets/caucasus-panorama.jpg";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
 function NotFoundComponent() {
@@ -81,16 +83,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Иронкарта — свои по всему миру" },
+      {
+        name: "description",
+        content: "Карта осетинских фамилий и истории, которые нас объединяют.",
+      },
+      { property: "og:title", content: "Иронкарта — свои по всему миру" },
+      {
+        property: "og:description",
+        content: "Карта осетинских фамилий и истории, которые нас объединяют.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -106,7 +116,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="ru">
       <head>
         <HeadContent />
       </head>
@@ -124,7 +134,18 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="site-shell">
+        <img
+          src={panorama}
+          className="mountain-scene"
+          alt="Горы Кавказа и осетинская башня"
+          width={1920}
+          height={640}
+        />
+        <SiteHeader />
+        <Outlet />
+        <SiteFooter />
+      </div>
     </QueryClientProvider>
   );
 }
