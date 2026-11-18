@@ -391,6 +391,35 @@ export type Database = {
           },
         ]
       }
+      messaging_send_events: {
+        Row: {
+          id: number
+          kind: string
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: never
+          kind: string
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: never
+          kind?: string
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messaging_send_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       participant_activity: {
         Row: {
           last_seen_at: string
@@ -640,6 +669,10 @@ export type Database = {
       claim_point_slot: { Args: { _bucket: string }; Returns: boolean }
       decide_conversation: {
         Args: { _conversation: string; _decision: string }
+        Returns: undefined
+      }
+      enforce_messaging_frequency: {
+        Args: { _kind: string; _user: string }
         Returns: undefined
       }
       has_role: {

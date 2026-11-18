@@ -43,4 +43,5 @@ use the editor.
 - Keep messaging writes in authenticated database RPCs with locked conversation transitions and private RLS; this prevents bypassing pending, blocks, bans and decline cooldowns through client calls.
 - Share one signed-in Realtime subscription in the account menu and invalidate messaging queries; this keeps unread badges and active chats synchronized without duplicate channels.
 - Expose participant contact fields only through authenticated narrow RPCs and sign peer avatars after inbox authorization; email and private profiles must never reach public pages.
+- Enforce rolling messaging frequency limits in write triggers using one per-account transaction lock and private event rows; requests, retries and first messages must share atomic rollback-safe enforcement across all dialogs.
 <!-- AGENT-MEMORY:END -->

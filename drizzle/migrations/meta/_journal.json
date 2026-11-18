@@ -64,6 +64,13 @@
       "when": 1794996341414,
       "tag": "0008_conversation_level_reports",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794996786877,
+      "tag": "0009_account_messaging_frequency_limits",
+      "breakpoints": true
     }
   ]
 }

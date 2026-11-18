@@ -111,7 +111,7 @@ function Profile() {
             <label className="field"><span>Фотография · до 2 МБ</span><input name="avatar" type="file" accept="image/jpeg,image/png,image/webp" className="min-w-0 max-w-full" /></label>
             <label className="my-5 flex items-center gap-3"><Switch checked={show} onCheckedChange={setShow} aria-label="Показывать меня на карте" /><span>Показывать меня на карте</span></label>
             <label className="my-5 flex items-center gap-3"><Switch checked={allowMessages} onCheckedChange={setAllowMessages} aria-label="Мне можно писать"/><span>Мне можно писать</span></label>
-            <label className="my-5 flex items-center gap-3"><Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} aria-label="Уведомления на почту"/><span>Уведомления на почту</span></label>
+            <label className="my-5 flex items-center gap-3"><Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} aria-label="Уведомления на почту"/><span>Уведомления на почту <small className="text-muted-foreground">· скоро</small></span></label>
             <label className="consent"><input type="checkbox" required defaultChecked={data.consented || Boolean(profile?.processing_consent_at)} /><span>Согласен на обработку данных по <Link to="/privacy" className="underline">политике конфиденциальности</Link></span></label>
             <div className="flex flex-wrap gap-3"><Button disabled={mutation.isPending} type="submit">{mutation.isPending ? 'Сохраняем…' : 'Сохранить'}</Button><Button type="button" variant="outline" onClick={cancel}>Отмена</Button></div>
           </fieldset>
