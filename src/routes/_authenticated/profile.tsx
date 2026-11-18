@@ -12,6 +12,8 @@ import { saveProfile, deleteAccount } from '@/lib/marks.functions';
 import { initialProfileMode, profileInitials } from '@/lib/profile-view';
 import { pageHead } from '@/data/demo';
 import { useParticipant } from '@/hooks/use-participant';
+import { Suspense } from 'react';
+import { BlockedList } from '@/components/messaging/blocked-list';
 import { googleDisplayName } from '@/lib/auth-flow';
 
 export const Route = createFileRoute('/_authenticated/profile')({
@@ -33,6 +35,8 @@ function Profile() {
   const remove = useServerFn(deleteAccount);
   const [mode, setMode] = useState(() => initialProfileMode(data.profile));
   const [show, setShow] = useState(data.profile?.show_on_map ?? true);
+  const [allowMessages,setAllowMessages]=useState(data.profile?.allow_messages??true);
+  const [emailNotifications,setEmailNotifications]=useState(data.profile?.email_notifications??true);
   const [confirm, setConfirm] = useState(false);
   const mutation = useMutation({
     mutationFn: async (form: FormData) => {
@@ -49,7 +53,7 @@ function Profile() {
       await save({ data: {
         name: String(form.get('name') ?? ''), familyName: String(form.get('family') ?? ''),
         country: String(form.get('country') ?? ''), city: String(form.get('city') ?? ''),
-        about: String(form.get('about') ?? ''), showOnMap: show, avatarPath, processingConsent: true,
+        about: String(form.get('about') ?? ''), showOnMap: show, allowMessages,emailNotifications, avatarPath, processingConsent: true,
       } });
       // Stay in editing until the saved data has been read back successfully.
       await qc.invalidateQueries({ queryKey: participantQuery().queryKey }, { throwOnError: true });
@@ -67,7 +71,7 @@ function Profile() {
   } });
   function edit() {
     mutation.reset(); deletion.reset(); setConfirm(false);
-    setShow(data.profile?.show_on_map ?? true); setMode('edit');
+    setShow(data.profile?.show_on_map ?? true); setAllowMessages(data.profile?.allow_messages??true); setEmailNotifications(data.profile?.email_notifications??true); setMode('edit');
   }
   function cancel() {
     mutation.reset(); deletion.reset(); setConfirm(false);
@@ -106,6 +110,8 @@ function Profile() {
             <label className="field"><span>О себе · до 300 символов</span><textarea name="about" maxLength={300} defaultValue={profile?.about ?? ''} className="w-full rounded-md border border-input bg-background p-3" /></label>
             <label className="field"><span>Фотография · до 2 МБ</span><input name="avatar" type="file" accept="image/jpeg,image/png,image/webp" className="min-w-0 max-w-full" /></label>
             <label className="my-5 flex items-center gap-3"><Switch checked={show} onCheckedChange={setShow} aria-label="Показывать меня на карте" /><span>Показывать меня на карте</span></label>
+            <label className="my-5 flex items-center gap-3"><Switch checked={allowMessages} onCheckedChange={setAllowMessages} aria-label="Мне можно писать"/><span>Мне можно писать</span></label>
+            <label className="my-5 flex items-center gap-3"><Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} aria-label="Уведомления на почту"/><span>Уведомления на почту</span></label>
             <label className="consent"><input type="checkbox" required defaultChecked={data.consented || Boolean(profile?.processing_consent_at)} /><span>Согласен на обработку данных по <Link to="/privacy" className="underline">политике конфиденциальности</Link></span></label>
             <div className="flex flex-wrap gap-3"><Button disabled={mutation.isPending} type="submit">{mutation.isPending ? 'Сохраняем…' : 'Сохранить'}</Button><Button type="button" variant="outline" onClick={cancel}>Отмена</Button></div>
           </fieldset>
@@ -128,9 +134,10 @@ function Profile() {
           {mark.moderation_note && <p className="mt-2 [overflow-wrap:anywhere]">Комментарий администратора: {mark.moderation_note}</p>}
         </article>;
       })}</div>
+      <Suspense fallback={<p>Загружаем список…</p>}><BlockedList/></Suspense>
       {mode === 'edit' && <section aria-label="Опасная зона" className="mt-10 border-t border-destructive/30 pt-6">
         <h2 className="!mt-0 text-destructive">Опасная зона</h2>
-        <p className="mb-4 mt-2">Удаление аккаунта также удалит профиль, фотографии и все ваши точки.</p>
+        <p className="mb-4 mt-2">Удаление аккаунта также удалит профиль, фотографии, все ваши точки, сообщения и диалоги.</p>
         {confirm ? <div><p className="mb-4">Удалить аккаунт без возможности восстановления?</p><div className="flex flex-wrap gap-3"><Button variant="destructive" disabled={deletion.isPending || mutation.isPending} onClick={() => deletion.mutate(undefined)}>Да, удалить аккаунт</Button><Button variant="outline" disabled={deletion.isPending} onClick={() => setConfirm(false)}>Отмена</Button></div></div> : <Button variant="destructive" disabled={mutation.isPending} onClick={() => setConfirm(true)}>Удалить аккаунт</Button>}
         {deletion.error && <p role="alert" className="mt-3 text-destructive">{deletion.error.message}</p>}
       </section>}

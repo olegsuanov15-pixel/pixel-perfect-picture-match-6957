@@ -1,3 +1,4 @@
+import {WriteButton} from '@/components/messaging/write-button';
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -114,6 +115,7 @@ function Family() {
                   <span>
                     {p.country}
                     {p.city && <small className="block mt-1">{p.city}</small>}
+                    <WriteButton pointId={p.id}/>
                   </span>
                 </div>
               ))}

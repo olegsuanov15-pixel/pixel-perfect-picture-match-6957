@@ -1,3 +1,4 @@
+import {WriteButton} from '@/components/messaging/write-button';
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -112,8 +113,8 @@ function Index() {
               <h2>{selected?.family ?? "Свои на карте"}</h2>
             </div>
             <div className="title-rule" />
-            {selected&&<p className="family-location">{selected.city} · {selected.country}</p>}
-            <div className="divide-y divide-border">{points.slice(0,5).map(p=><Link key={p.id} to="/family/$slug" params={{slug:p.slug}} className="block py-2 text-sm"><strong>{p.family}</strong><br/>{p.country}{p.city?` · ${p.city}`:''}</Link>)}</div>
+            {selected&&<><p className="family-location">{selected.city} · {selected.country}</p><WriteButton pointId={selected.id}/></>}
+            <div className="divide-y divide-border">{points.slice(0,5).map(p=><div key={p.id} className="py-2"><Link to="/family/$slug" params={{slug:p.slug}} className="block py-2 text-sm"><strong>{p.family}</strong><br/>{p.country}{p.city?` · ${p.city}`:''}</Link><WriteButton pointId={p.id}/></div>)}</div>
             <div className="community-line">
 
               <span>

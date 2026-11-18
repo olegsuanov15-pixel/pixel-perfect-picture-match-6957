@@ -50,6 +50,20 @@
       "when": 1794994614206,
       "tag": "0006_verified_owner_admin",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794996005305,
+      "tag": "0007_private_participant_messaging",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794996341414,
+      "tag": "0008_conversation_level_reports",
+      "breakpoints": true
     }
   ]
 }

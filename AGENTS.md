@@ -40,4 +40,7 @@ use the editor.
 - Keep profile drafts in the edit form and await participant-query refresh before switching to the read-only view, so saved details and avatar stay current; mount toast notifications once in the root shell.
 - Complete managed OAuth only after session hydration, carrying a sanitized same-origin return path in sessionStorage; route empty profiles to editing with a Google-name draft rather than persisting unconfirmed profile details.
 - Grant automatic roles through verified-email auth lifecycle triggers and check admin via server-side has_role RPC, so client metadata cannot grant privileges.
+- Keep messaging writes in authenticated database RPCs with locked conversation transitions and private RLS; this prevents bypassing pending, blocks, bans and decline cooldowns through client calls.
+- Share one signed-in Realtime subscription in the account menu and invalidate messaging queries; this keeps unread badges and active chats synchronized without duplicate channels.
+- Expose participant contact fields only through authenticated narrow RPCs and sign peer avatars after inbox authorization; email and private profiles must never reach public pages.
 <!-- AGENT-MEMORY:END -->

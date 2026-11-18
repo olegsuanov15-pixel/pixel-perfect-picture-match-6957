@@ -1,3 +1,4 @@
+import {WriteButton} from '@/components/messaging/write-button';
 import { useState } from "react";
 import { MapPin, Plus, Minus, Maximize } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -64,6 +65,7 @@ export function WorldMap({
             </Button>
           ))}
       </div>
+      {points.find(p=>p.id===selected)&&<div className="absolute bottom-14 left-4 z-20"><WriteButton pointId={selected}/></div>}
       <div className="map-controls">
         <Button
           variant="ghost"

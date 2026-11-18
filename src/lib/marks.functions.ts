@@ -18,14 +18,14 @@ export const submitMark=createServerFn({method:'POST'}).inputValidator((v:unknow
  return {saved:true,id:point.id,deleteToken:userId?null:point.guest_delete_token};
 });
 export const getParticipant=createServerFn({method:'GET'}).middleware([requireSupabaseAuth]).handler(async({context})=>{
- const [roles,profile,marks,consent]=await Promise.all([context.supabase.rpc('has_role',{_user_id:context.userId,_role:'admin'}),context.supabase.from('profiles').select('display_name,avatar_path,family_name,country,city,about,show_on_map,processing_consent_at').eq('id',context.userId).maybeSingle(),context.supabase.from('map_points').select('id,country,city,status,moderation_note,families(name)').eq('user_id',context.userId).order('created_at',{ascending:false}),context.supabase.from('registration_consents').select('accepted_at').eq('user_id',context.userId).maybeSingle()]);
+ const [roles,profile,marks,consent]=await Promise.all([context.supabase.rpc('has_role',{_user_id:context.userId,_role:'admin'}),context.supabase.from('profiles').select('display_name,avatar_path,family_name,country,city,about,show_on_map,allow_messages,email_notifications,processing_consent_at').eq('id',context.userId).maybeSingle(),context.supabase.from('map_points').select('id,country,city,status,moderation_note,families(name)').eq('user_id',context.userId).order('created_at',{ascending:false}),context.supabase.from('registration_consents').select('accepted_at').eq('user_id',context.userId).maybeSingle()]);
  if(roles.error||profile.error||marks.error)throw new Error('Не удалось загрузить профиль');let avatarUrl:string|null=null;
  if(profile.data?.avatar_path){const {data}=await context.supabase.storage.from('participant-avatars').createSignedUrl(profile.data.avatar_path,600);avatarUrl=data?.signedUrl??null;}
  return {userId:context.userId,profile:profile.data,avatarUrl,moderator:roles.data===true,marks:marks.data,consented:Boolean(consent.data)};
 });
 export const saveProfile=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator((v:unknown)=>profileInput.parse(v)).handler(async({data,context})=>{
  if(data.avatarPath&&!data.avatarPath.startsWith(`${context.userId}/`))throw new Error('Недопустимое фото');
- const {error}=await context.supabase.from('profiles').upsert({id:context.userId,display_name:data.name,family_name:data.familyName,country:data.country,city:data.city,about:data.about,show_on_map:data.showOnMap,avatar_path:data.avatarPath,processing_consent_at:new Date().toISOString()});if(error)throw new Error('Не удалось сохранить профиль');
+ const {error}=await context.supabase.from('profiles').upsert({id:context.userId,display_name:data.name,family_name:data.familyName,country:data.country,city:data.city,about:data.about,show_on_map:data.showOnMap,allow_messages:data.allowMessages,email_notifications:data.emailNotifications,avatar_path:data.avatarPath,processing_consent_at:new Date().toISOString()});if(error)throw new Error('Не удалось сохранить профиль');
  await context.supabase.from('registration_consents').upsert({user_id:context.userId});return {saved:true};
 });
 export const getModeration=createServerFn({method:'GET'}).middleware([requireSupabaseAuth]).handler(async({context})=>{
