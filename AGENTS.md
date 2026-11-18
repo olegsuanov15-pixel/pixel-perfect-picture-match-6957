@@ -29,6 +29,7 @@ use the editor.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
 <!-- AGENT-MEMORY:BEGIN -->
+- Resolve surname identity atomically through the database resolver and owner-profile trigger; keep browser comparison in sync with database keys, and merge all family references transactionally to prevent duplicate lineages and lost history.
 - Submit guest and authenticated map_points through validated server functions with pending status, explicit consents, a honeypot and an atomic database frequency gate; derive signed-in identity from the verified bearer.
 - Only admin roles in user_roles may moderate; validate has_role server-side before privileged reads or writes, never trust client role values.
 - Keep profiles and avatar storage owner-private; signed-in pages live under the client-only authenticated layout because browser sessions are unavailable during SSR.

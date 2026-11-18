@@ -9,9 +9,8 @@ export type MarkRecord = {
   status: string;
   consent_to_publish: boolean;
 };
-export function normalizeSurname(value: string) {
-  return value.normalize("NFKC").trim().toLocaleLowerCase("ru").replace(/ё/g, "е");
-}
+import { familyKey } from './family-normalization';
+export const normalizeSurname = familyKey;
 export function matchesSurname(family: FamilyRecord, query: string) {
   const normalized = normalizeSurname(query);
   return [family.name, ...family.aliases].some((name) =>

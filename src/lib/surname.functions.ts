@@ -41,6 +41,7 @@ export const getSurnameAdmin = createServerFn({method:'GET'}).middleware([requir
   return {families:families.data,cards:cards.data,details:details.data,submissions:submissions.data};
 });
 const adminInput = z.discriminatedUnion('action',[
+  z.object({action:z.literal('merge'),source:z.string().uuid(),target:z.string().uuid()}),
   z.object({action:z.literal('card'),card:cardInput}),
   z.object({action:z.literal('delete'),id:z.string().uuid()}),
   z.object({action:z.literal('details'),family_id:z.string().uuid(),home_villages:z.array(z.string().trim().max(200)).max(30),region:z.string().trim().max(300),progenitor:z.string().trim().max(200),related_family_ids:z.array(z.string().uuid()).max(50),related_family_names:z.array(z.string().trim().min(1).max(100)).max(50)}),
@@ -52,7 +53,8 @@ export const editSurname = createServerFn({method:'POST'}).middleware([requireSu
   if(role.error || !role.data) throw new Error('Нет прав администратора');
   const db = context.supabase;
   let error;
-  if(data.action==='card') {
+  if(data.action==='merge') { error=(await db.rpc('merge_families',{_source:data.source,_target:data.target})).error; }
+  else if(data.action==='card') {
     const {id,...card}=data.card;
     const result = id ? await db.from('surname_cards').update(card).eq('id',id) : await db.from('surname_cards').insert({...card,created_by:context.userId}); error=result.error;
   } else if(data.action==='delete') { error=(await db.from('surname_cards').delete().eq('id',data.id)).error; }

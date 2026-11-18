@@ -9,6 +9,7 @@ import { surnameAdminQuery } from '@/lib/surname-query';
 import { editSurname } from '@/lib/surname.functions';
 import { cardInput,cardTypes,type SurnameCard } from '@/lib/surname-rules';
 import { SourceCard } from './source-card';
+import { matchesSurname } from '@/lib/catalog-rules';
 
 type Seed={familyId:string;text:string;source:string};
 function blankCard(familyId:string,order=0):SurnameCard {return {family_id:familyId,type:'legend',title:'',summary:'',source_title:'',source_url:'',sort_order:order,status:'draft',origin:'admin'};}
@@ -19,9 +20,9 @@ function useEditorMutation() {
 export function SurnameAdmin({seed}:{seed?:Seed}) {
   const {data}=useSuspenseQuery(surnameAdminQuery());const [selected,setSelected]=useState(seed?.familyId??'');const [q,setQ]=useState('');
   const family=data.families.find(f=>f.id===selected);
-  if(!family)return <div><label className="field max-w-md"><span>Поиск фамилии</span><input value={q} onChange={e=>setQ(e.target.value)}/></label><div className="surname-admin-list">{data.families.filter(f=>f.name.toLowerCase().includes(q.toLowerCase())).map(f=><Button key={f.id} variant="outline" onClick={()=>setSelected(f.id)}>{f.name}</Button>)}</div></div>;
+  if(!family)return <div><label className="field max-w-md"><span>Поиск фамилии</span><input value={q} onChange={e=>setQ(e.target.value)}/></label><div className="surname-admin-list">{data.families.filter(f=>matchesSurname(f,q)).map(f=><Button key={f.id} variant="outline" onClick={()=>setSelected(f.id)}>{f.name}</Button>)}</div></div>;
   const details=data.details.find(d=>d.family_id===family.id);
-  return <div><Button variant="ghost" onClick={()=>setSelected('')}><ArrowLeft/>Все фамилии</Button><div className="my-4 flex flex-wrap items-center gap-4"><h2 className="section-title">{family.name}</h2><Button asChild variant="link"><Link to="/surname/$slug" params={{slug:family.name.toLocaleLowerCase('ru')}}>Открыть страницу</Link></Button></div><FamilyEditor key={family.id} familyId={family.id} details={details} families={data.families} cards={data.cards.filter(c=>c.family_id===family.id)} seed={seed?.familyId===family.id?seed:undefined}/></div>;
+  return <div><Button variant="ghost" onClick={()=>setSelected('')}><ArrowLeft/>Все фамилии</Button><div className="my-4 flex flex-wrap items-center gap-4"><h2 className="section-title">{family.name}</h2><Button asChild variant="link"><Link to="/surname/$slug" params={{slug:family.name.toLocaleLowerCase('ru')}}>Открыть страницу</Link></Button></div><FamilyMerge family={family} families={data.families} onMerged={setSelected}/><FamilyEditor key={family.id} familyId={family.id} details={details} families={data.families} cards={data.cards.filter(c=>c.family_id===family.id)} seed={seed?.familyId===family.id?seed:undefined}/></div>;
 }
 function FamilyEditor({familyId,details,families,cards,seed}:{familyId:string;details?:{home_villages:string[];region:string;progenitor:string;related_family_names:string[];related_family_ids:string[]}|undefined;families:{id:string;name:string}[];cards:{id:string;family_id:string;type:string;title:string;summary:string;source_title:string;source_url:string;sort_order:number;status:string;origin:string}[];seed?:Seed|undefined}) {
   const m=useEditorMutation();const [draft,setDraft]=useState<SurnameCard|null>(seed?{...blankCard(familyId,cards.length),summary:seed.text.slice(0,400),source_url:seed.source,origin:'user'}:null);
@@ -47,6 +48,10 @@ function FamilyEditor({familyId,details,families,cards,seed}:{familyId:string;de
 function zCards(cards:unknown[]) {
   const parsed=cardInput.extend({id:cardInput.shape.family_id}).array().safeParse(cards);
   return parsed.success?parsed.data:null;
+}
+function FamilyMerge({family,families,onMerged}:{family:{id:string;name:string;aliases:string[]};families:{id:string;name:string}[];onMerged:(id:string)=>void}) {
+ const [target,setTarget]=useState('');const m=useEditorMutation();
+ return <section className="my-6 border-b border-border pb-6"><h3 className="font-bold">Варианты написания</h3><p className="my-3 break-words text-sm">{family.aliases.join(', ')||'Алиасов пока нет'}</p><label className="field max-w-md"><span>Основная фамилия</span><select value={target} onChange={e=>setTarget(e.target.value)}><option value="">Выберите основную фамилию</option>{families.filter(f=>f.id!==family.id).map(f=><option key={f.id} value={f.id}>{f.name}</option>)}</select></label><Button variant="outline" disabled={!target||m.isPending} onClick={async()=>{const main=families.find(f=>f.id===target);if(!main||!window.confirm(`Объединить «${family.name}» с «${main.name}»? Все отметки, карточки, истории и алиасы будут перенесены.`))return;try{await m.mutateAsync({data:{action:'merge',source:family.id,target}});onMerged(target);}catch{/* Error is shown by mutation. */}}}>Объединить с…</Button></section>;
 }
 export function StoryQueue() {
   const {data}=useSuspenseQuery(surnameAdminQuery());const m=useEditorMutation();const [seed,setSeed]=useState<Seed|null>(null);const [status,setStatus]=useState('pending');

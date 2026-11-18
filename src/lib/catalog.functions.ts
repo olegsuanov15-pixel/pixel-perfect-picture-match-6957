@@ -18,6 +18,9 @@ export const getCatalog = createServerFn({ method: "GET" })
       families.push(...response.data);
       if (response.data.length < 1000) break;
     }
+    const aliases=await db.from('family_aliases').select('alias,family_id');
+    if(aliases.error)throw new Error('Не удалось загрузить варианты фамилий');
+    for(const family of families) family.aliases=[...new Set([...family.aliases,...aliases.data.filter(a=>a.family_id===family.id).map(a=>a.alias)])];
     const response=await db.rpc("public_map_points");
     if(response.error)throw new Error(response.error.message);
     const marks=publicMarks(response.data);
@@ -54,6 +57,10 @@ export const getFamily = createServerFn({ method: "GET" })
     if (familyResponse.error) throw new Error(familyResponse.error.message);
     if (!familyResponse.data) familyResponse = await db.from('families').select('id,name,slug,aliases').ilike('name',data.slug).maybeSingle();
     if (familyResponse.error) throw new Error(familyResponse.error.message);
+    if (!familyResponse.data) {
+      const alias=await db.from('family_aliases').select('family_id').eq('alias',data.slug).maybeSingle();
+      if(alias.data) familyResponse=await db.from('families').select('id,name,slug,aliases').eq('id',alias.data.family_id).maybeSingle();
+    }
     if (!familyResponse.data) return null;
     const family = familyResponse.data;
     const historyResponse = await db

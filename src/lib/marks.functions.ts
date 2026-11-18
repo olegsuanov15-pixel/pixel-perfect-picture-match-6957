@@ -12,7 +12,7 @@ export const submitMark=createServerFn({method:'POST'}).inputValidator((v:unknow
  const ip=getRequestIP({xForwardedFor:true})??'unknown';const raw=new TextEncoder().encode(`${process.env['LOVABLE_CRON_SECRET']}|${ip}|${userId??'guest'}`);const hash=await crypto.subtle.digest('SHA-256',raw);const bucket=Array.from(new Uint8Array(hash),v=>v.toString(16).padStart(2,'0')).join('');
  const slot=await db.rpc('claim_point_slot',{_bucket:bucket});if(slot.error||!slot.data)throw new Error('Подождите минуту перед следующей отправкой.');
  let familyId=data.familyId;
- if(!familyId){const name=data.familyName??'';const existing=await db.from('families').select('id').ilike('name',name).maybeSingle();if(existing.data)familyId=existing.data.id;else{const row=await db.from('families').insert({name,slug:`family-${crypto.randomUUID()}`,aliases:[]}).select('id').single();familyId=row.data?.id;}}
+ if(data.familyName){const result=await db.rpc('resolve_family',{_name:data.familyName});if(result.error)throw new Error('Не удалось сохранить фамилию');familyId=result.data;}
  if(!familyId)throw new Error('Не удалось сохранить фамилию');
  const {data:point,error}=await db.from('map_points').insert({family_id:familyId,user_id:userId,country:data.country,city:data.city||null,status:'pending',consent_to_publish:true}).select('id,guest_delete_token').single();if(error||!point)throw new Error('Не удалось сохранить отметку');
  return {saved:true,id:point.id,deleteToken:userId?null:point.guest_delete_token};

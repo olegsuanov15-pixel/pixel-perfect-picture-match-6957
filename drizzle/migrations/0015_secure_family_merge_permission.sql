@@ -1,0 +1,1 @@
+DO $$ DECLARE definition text; BEGIN SELECT pg_get_functiondef('public.merge_families(uuid,uuid)'::regprocedure) INTO definition; definition:=replace(definition,'current_user <> ''postgres''','session_user <> ''postgres'''); EXECUTE definition; END $$;

@@ -168,6 +168,7 @@ export type Database = {
       families: {
         Row: {
           aliases: string[]
+          canonical_key: string | null
           created_at: string
           id: string
           name: string
@@ -175,6 +176,7 @@ export type Database = {
         }
         Insert: {
           aliases?: string[]
+          canonical_key?: string | null
           created_at?: string
           id?: string
           name: string
@@ -182,12 +184,39 @@ export type Database = {
         }
         Update: {
           aliases?: string[]
+          canonical_key?: string | null
           created_at?: string
           id?: string
           name?: string
           slug?: string
         }
         Relationships: []
+      }
+      family_aliases: {
+        Row: {
+          alias: string
+          alias_key: string | null
+          family_id: string
+        }
+        Insert: {
+          alias: string
+          alias_key?: string | null
+          family_id: string
+        }
+        Update: {
+          alias?: string
+          alias_key?: string | null
+          family_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_aliases_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       family_details: {
         Row: {
@@ -562,6 +591,7 @@ export type Database = {
           created_at: string
           display_name: string
           email_notifications: boolean
+          family_id: string | null
           family_name: string
           id: string
           processing_consent_at: string | null
@@ -576,6 +606,7 @@ export type Database = {
           created_at?: string
           display_name?: string
           email_notifications?: boolean
+          family_id?: string | null
           family_name?: string
           id: string
           processing_consent_at?: string | null
@@ -590,12 +621,21 @@ export type Database = {
           created_at?: string
           display_name?: string
           email_notifications?: boolean
+          family_id?: string | null
           family_name?: string
           id?: string
           processing_consent_at?: string | null
           show_on_map?: boolean
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       registration_consents: {
         Row: {
@@ -839,6 +879,7 @@ export type Database = {
       }
       can_contact_participant: { Args: { _target: string }; Returns: boolean }
       can_read_conversation: { Args: { _id: string }; Returns: boolean }
+      canonical_family_name: { Args: { v: string }; Returns: string }
       claim_point_slot: { Args: { _bucket: string }; Returns: boolean }
       claim_story_slot: { Args: { _bucket: string }; Returns: boolean }
       decide_conversation: {
@@ -849,6 +890,7 @@ export type Database = {
         Args: { _kind: string; _user: string }
         Returns: undefined
       }
+      family_key: { Args: { v: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -862,6 +904,10 @@ export type Database = {
       }
       mark_conversation_read: {
         Args: { _conversation: string }
+        Returns: undefined
+      }
+      merge_families: {
+        Args: { _source: string; _target: string }
         Returns: undefined
       }
       message_contacts: {
@@ -911,6 +957,7 @@ export type Database = {
         Args: { _conversation: string; _details: string; _reason: string }
         Returns: string
       }
+      resolve_family: { Args: { _name: string }; Returns: string }
       review_conversation_report: {
         Args: { _ban: boolean; _report: string }
         Returns: undefined

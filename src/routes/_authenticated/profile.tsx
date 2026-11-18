@@ -16,6 +16,7 @@ import { Suspense } from 'react';
 import { BlockedList } from '@/components/messaging/blocked-list';
 import { LandscapeHero } from '@/components/ironkarta/landscape-hero';
 import { googleDisplayName } from '@/lib/auth-flow';
+import { SurnameInput } from '@/components/ironkarta/surname-input';
 
 export const Route = createFileRoute('/_authenticated/profile')({
   head: () => pageHead('Профиль', 'Личные данные участника и управление показом на карте.'),
@@ -105,7 +106,7 @@ function Profile() {
           <fieldset disabled={mutation.isPending || deletion.isPending}>
             {data.avatarUrl && <img src={data.avatarUrl} alt="Фото профиля" className="mb-4 size-20 rounded-full object-cover" />}
             <label className="field"><span>Имя</span><input name="name" maxLength={80} defaultValue={profile?.display_name || (initialProfileMode(profile) === 'edit' && user?.app_metadata['provider'] === 'google' ? googleDisplayName(user.user_metadata) : '')} /></label>
-            <label className="field"><span>Фамилия (род)</span><input name="family" maxLength={100} defaultValue={profile?.family_name ?? ''} /></label>
+            <SurnameInput name="family" label="Фамилия (род)" initial={profile?.family_name??''}/>
             <label className="field"><span>Страна</span><input name="country" maxLength={100} defaultValue={profile?.country ?? ''} /></label>
             <label className="field"><span>Город</span><input name="city" maxLength={120} defaultValue={profile?.city ?? ''} /></label>
             <label className="field"><span>О себе · до 300 символов</span><textarea name="about" maxLength={300} defaultValue={profile?.about ?? ''} className="w-full rounded-md border border-input bg-background p-3" /></label>
