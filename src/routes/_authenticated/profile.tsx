@@ -14,6 +14,7 @@ import { pageHead } from '@/data/demo';
 import { useParticipant } from '@/hooks/use-participant';
 import { Suspense } from 'react';
 import { BlockedList } from '@/components/messaging/blocked-list';
+import { LandscapeHero } from '@/components/ironkarta/landscape-hero';
 import { googleDisplayName } from '@/lib/auth-flow';
 
 export const Route = createFileRoute('/_authenticated/profile')({
@@ -82,10 +83,10 @@ function Profile() {
   }
   const profile = data.profile;
   const visible = profile?.show_on_map ?? true;
-  return <main className="page-main">
+  return <main className="page-main app-content profile-page"><LandscapeHero title="Мой профиль"/>
     <section className="prose-page">
       <div className="mb-7 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="!mb-0">Мой профиль</h1>
+        
         {mode === 'view' && <Button variant="outline" onClick={edit}><Pencil className="size-4" />Редактировать</Button>}
       </div>
       {mode === 'view' ? <article aria-label="Карточка профиля" className="rounded-lg border border-border bg-card p-5 sm:p-8">

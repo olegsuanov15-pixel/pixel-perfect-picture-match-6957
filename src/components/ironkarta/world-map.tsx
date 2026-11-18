@@ -64,10 +64,10 @@ export function WorldMap({
               onClick={() => onSelect?.(p)}
               title={`${p.family} · ${p.city}`}
             >
-              <MapPin />
+              <svg viewBox="0 0 24 30" aria-hidden="true"><path d="M12 1C5.9 1 1 5.9 1 12c0 7.3 11 17 11 17s11-9.7 11-17C23 5.9 18.1 1 12 1Z"/><circle cx="12" cy="11" r="4" className="pin-center"/></svg>
               {selected === p.id && (
                 <span className="pin-tooltip">
-                  {p.family} · {p.city}
+                  {p.city || p.family}
                 </span>
               )}
             </Button>
