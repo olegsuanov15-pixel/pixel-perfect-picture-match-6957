@@ -1,0 +1,3 @@
+CREATE FUNCTION public.public_family_participant_counts() RETURNS TABLE(family_id uuid,participant_count bigint) LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public AS $$ SELECT m.family_id,count(DISTINCT m.user_id) FROM public.map_points m JOIN public.profiles p ON p.id=m.user_id WHERE m.status='approved' AND m.consent_to_publish AND p.show_on_map GROUP BY m.family_id $$;
+REVOKE ALL ON FUNCTION public.public_family_participant_counts() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.public_family_participant_counts() TO anon,authenticated,service_role;

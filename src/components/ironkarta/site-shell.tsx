@@ -1,6 +1,8 @@
+import panorama from '@/assets/caucasus-panorama.jpg';
 import { Link } from "@tanstack/react-router";
 import { Heart, ArrowUpRight } from "lucide-react";
 import { AccountMenu } from "./account-menu";
+import { NotificationBell,BottomNavigation } from './app-navigation';
 
 export function Ornament() {
   return (
@@ -24,27 +26,25 @@ export function Ornament() {
 export function SiteHeader() {
 
   return (
-    <header className="site-header">
+    <header className="site-header"><img className="header-landscape" src={panorama} alt=""/>
       <Link to="/" className="brand">
         <Ornament />
         <span className="brand-divider" />
-        <span>Иронкарта</span>
+        <span className="brand-copy">Иронкарта<small>Цифровая карта Осетии</small></span>
       </Link>
       <nav aria-label="Главное меню" className="header-nav">
         <Link to="/" activeOptions={{ exact: true }} className="nav-link">
           Карта
         </Link>
+        <Link to="/catalog" className="nav-link">Каталог</Link>
         <Link to="/stories" className="nav-link">
-          Истории фамилий
+          История
         </Link>
-        <Link to="/about" className="nav-link">
-          О проекте
+        <Link to="/profile" className="nav-link">
+          Профиль
         </Link>
-        <AccountMenu/>
       </nav>
-      <span className="header-note">
-        <Heart size={13} /> Из Осетии. С любовью.
-      </span>
+      <div className="header-account"><NotificationBell/><AccountMenu/></div>
     </header>
   );
 }
@@ -61,3 +61,4 @@ export function SiteFooter() {
     </footer>
   );
 }
+export { BottomNavigation };

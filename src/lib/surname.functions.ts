@@ -43,7 +43,7 @@ export const getSurnameAdmin = createServerFn({method:'GET'}).middleware([requir
 const adminInput = z.discriminatedUnion('action',[
   z.object({action:z.literal('card'),card:cardInput}),
   z.object({action:z.literal('delete'),id:z.string().uuid()}),
-  z.object({action:z.literal('details'),family_id:z.string().uuid(),home_villages:z.array(z.string().trim().max(200)).max(30),region:z.string().trim().max(300),related_family_ids:z.array(z.string().uuid()).max(50),related_family_names:z.array(z.string().trim().min(1).max(100)).max(50)}),
+  z.object({action:z.literal('details'),family_id:z.string().uuid(),home_villages:z.array(z.string().trim().max(200)).max(30),region:z.string().trim().max(300),progenitor:z.string().trim().max(200),related_family_ids:z.array(z.string().uuid()).max(50),related_family_names:z.array(z.string().trim().min(1).max(100)).max(50)}),
   z.object({action:z.literal('order'),cards:z.array(cardInput.extend({id:z.string().uuid()})).max(100)}),
   z.object({action:z.literal('submission'),id:z.string().uuid(),status:z.enum(['accepted','rejected'])}),
 ]);

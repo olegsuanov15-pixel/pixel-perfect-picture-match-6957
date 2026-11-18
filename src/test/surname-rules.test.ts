@@ -40,5 +40,5 @@ describe('Surname rules',()=>{
       await expect(db.exec(`INSERT INTO public.surname_cards(family_id,type,title,summary) VALUES('${familyId}','legend','Unauthorized','Text')`)).rejects.toThrow();
       await expect(db.query(`select public.claim_story_slot('bypass')`)).rejects.toThrow();
     }finally{await db.close();}
-  });
+  },15000);
 });

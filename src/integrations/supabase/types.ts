@@ -193,6 +193,7 @@ export type Database = {
         Row: {
           family_id: string
           home_villages: string[]
+          progenitor: string
           region: string
           related_family_ids: string[]
           related_family_names: string[]
@@ -201,6 +202,7 @@ export type Database = {
         Insert: {
           family_id: string
           home_villages?: string[]
+          progenitor?: string
           region?: string
           related_family_ids?: string[]
           related_family_names?: string[]
@@ -209,6 +211,7 @@ export type Database = {
         Update: {
           family_id?: string
           home_villages?: string[]
+          progenitor?: string
           region?: string
           related_family_ids?: string[]
           related_family_names?: string[]
@@ -873,6 +876,13 @@ export type Database = {
         }[]
       }
       messaging_inbox: { Args: never; Returns: Json }
+      public_family_participant_counts: {
+        Args: never
+        Returns: {
+          family_id: string
+          participant_count: number
+        }[]
+      }
       public_map_points: {
         Args: never
         Returns: {
@@ -887,6 +897,7 @@ export type Database = {
           status: string
         }[]
       }
+      public_participant_count: { Args: never; Returns: number }
       report_conversation: {
         Args: {
           _conversation: string

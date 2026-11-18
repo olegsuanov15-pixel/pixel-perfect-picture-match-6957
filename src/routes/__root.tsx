@@ -15,7 +15,7 @@ import { ParticipantContext } from "@/hooks/use-participant";
 import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
-import { SiteHeader, SiteFooter } from "@/components/ironkarta/site-shell";
+import { SiteHeader, SiteFooter,BottomNavigation } from "@/components/ironkarta/site-shell";
 import panorama from "@/assets/caucasus-panorama.jpg";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -164,6 +164,7 @@ function RootComponent() {
         <SiteHeader />
         <Outlet />
         <SiteFooter />
+        <BottomNavigation />
       </div>
       <Toaster />
       </ParticipantContext.Provider>

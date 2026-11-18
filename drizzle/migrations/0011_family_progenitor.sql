@@ -1,0 +1,2 @@
+ALTER TABLE public.family_details ADD COLUMN progenitor text NOT NULL DEFAULT '';
+COMMENT ON COLUMN public.family_details.progenitor IS 'Родоначальник по опубликованным преданиям; не окончательный факт';

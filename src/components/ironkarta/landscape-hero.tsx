@@ -1,0 +1,3 @@
+import type { ReactNode } from 'react';
+import panorama from '@/assets/caucasus-panorama.jpg';
+export function LandscapeHero({title,subtitle,children}:{title:string;subtitle?:string;children?:ReactNode}){return <header className="landscape-hero"><img src={panorama} alt="Горы Кавказа и осетинская башня"/><div className="hero-shade"/><div className="hero-ornament" aria-hidden="true"><svg viewBox="0 0 40 180" fill="none"><path d="m20 5 15 15-15 15L5 20 20 5Zm0 45 15 15-15 15L5 65l15-15Zm0 45 15 15-15 15-15-15 15-15Zm0 45 15 15-15 15-15-15 15-15Z" stroke="currentColor" strokeWidth="2"/></svg></div><div className="hero-content">{children}<h1>{title}</h1>{subtitle&&<p>{subtitle}</p>}</div></header>;}

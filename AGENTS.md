@@ -45,4 +45,5 @@ use the editor.
 - Expose participant contact fields only through authenticated narrow RPCs and sign peer avatars after inbox authorization; email and private profiles must never reach public pages.
 - Enforce rolling messaging frequency limits in write triggers using one per-account transaction lock and private event rows; requests, retries and first messages must share atomic rollback-safe enforcement across all dialogs.
 - Share the surname view between the canonical Cyrillic surname URL and legacy family URLs; public cards use published-only RLS, editorial writes require server-verified admin, and guest stories use validated server writes with a private atomic frequency gate.
+- Keep app navigation and notification badges in the shared shell; catalogue and story cards consume public query DTOs, while participant totals expose only an aggregate count and no account identifiers.
 <!-- AGENT-MEMORY:END -->

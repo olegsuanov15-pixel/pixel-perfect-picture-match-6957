@@ -1,0 +1,3 @@
+CREATE FUNCTION public.public_participant_count() RETURNS bigint LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public AS $$ SELECT count(DISTINCT m.user_id) FROM public.map_points m JOIN public.profiles p ON p.id=m.user_id WHERE m.status='approved' AND m.consent_to_publish AND p.show_on_map $$;
+REVOKE ALL ON FUNCTION public.public_participant_count() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.public_participant_count() TO anon,authenticated,service_role;

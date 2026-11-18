@@ -21,12 +21,16 @@ export const getCatalog = createServerFn({ method: "GET" })
     const response=await db.rpc("public_map_points");
     if(response.error)throw new Error(response.error.message);
     const marks=publicMarks(response.data);
-    const details=await db.from('family_details').select('family_id');
+    const details=await db.from('family_details').select('family_id,home_villages,region,progenitor');
     if(details.error)throw new Error(details.error.message);
-    const cards=await db.from('surname_cards').select('family_id').eq('status','published');
+    const cards=await db.from('surname_cards').select('id,family_id,title,summary,type,sort_order').eq('status','published').order('sort_order');
     if(cards.error)throw new Error(cards.error.message);
     const visibleIds=new Set([...marks.map(m=>m.family_id),...details.data.map(d=>d.family_id),...cards.data.map(c=>c.family_id)]);
-    return {families:families.filter(f=>visibleIds.has(f.id)&&matchesSurname(f,data.q)),marks};
+    const participants=await db.rpc('public_participant_count');
+    if(participants.error)throw new Error('Не удалось загрузить статистику');
+    const counts=await db.rpc('public_family_participant_counts');
+    if(counts.error)throw new Error('Не удалось загрузить участников');
+    return {participantCounts:counts.data,participantCount:Number(participants.data),families:families.filter(f=>visibleIds.has(f.id)&&matchesSurname(f,data.q)),allFamilies:families.filter(f=>matchesSurname(f,data.q)),details:details.data,cards:cards.data,marks};
   });
 export const getFamily = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) =>
@@ -65,7 +69,7 @@ export const getFamily = createServerFn({ method: "GET" })
     if(response.error)throw new Error(response.error.message);
     const [cards,details,related]=await Promise.all([
       db.from('surname_cards').select('id,family_id,type,title,summary,source_title,source_url,sort_order,status,origin').eq('family_id',family.id).eq('status','published').order('sort_order').order('created_at'),
-      db.from('family_details').select('home_villages,region,related_family_ids,related_family_names').eq('family_id',family.id).maybeSingle(),
+      db.from('family_details').select('home_villages,region,related_family_ids,related_family_names,progenitor').eq('family_id',family.id).maybeSingle(),
       db.from('families').select('id,name,slug,aliases').order('name'),
     ]);
     if(cards.error||details.error||related.error)throw new Error('Не удалось загрузить источники');

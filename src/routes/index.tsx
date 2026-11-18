@@ -1,152 +1,25 @@
-import {WriteButton} from '@/components/messaging/write-button';
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import {
-  Search,
-  MapPin,
-  Globe2,
-  Users,
-  ArrowRight,
-  HeartHandshake,
-  Share2,
-  Check,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { WorldMap } from "@/components/ironkarta/world-map";
-import { AddPoint } from "@/components/ironkarta/add-point";
-import { pageHead } from "@/data/demo";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { catalogQuery } from "@/lib/catalog-query";
-import { DataError, DataNotFound } from "@/components/ironkarta/data-boundaries";
-import { SurnameSearch } from "@/components/ironkarta/surname-search";
-
-export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>): { point?: string } =>
-    typeof search["point"] === "string" ? { point: search["point"] } : {},
-  head: () =>
-    pageHead(
-      "Найди своих по всему миру",
-      "Карта осетинских фамилий. Найдите своих, где бы вы ни были.",
-    ),
-  loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(catalogQuery());
-  },
-  errorComponent: DataError,
-  notFoundComponent: DataNotFound,
-  component: Index,
-});
-function Index() {
-  const { point } = Route.useSearch();
-  const { data } = useSuspenseQuery(catalogQuery());
-  const points = [...data.marks].sort((a,b)=>b.created_at.localeCompare(a.created_at)).flatMap((mark) => {
-    const family = data.families.find((f) => f.id === mark.family_id);
-    return family ? [{ ...mark, family: family.name, slug: family.slug }] : [];
-  });
-  const [selectedId, setSelectedId] = useState(point ?? "");
-  const selected = points.find((p) => p.id === selectedId) ?? points[0];
-  const [shared, setShared] = useState(false);
-  const countriesCount = new Set(points.map((p) => p.country)).size;
-  const participants = points.length;
-  function focusForm() {
-    document.getElementById("add-point")?.scrollIntoView({ behavior: "smooth", block: "center" });
-    document.querySelector<HTMLInputElement>("#add-point input")?.focus({ preventScroll: true });
-  }
-  async function share() {
-    try {
-      await navigator.clipboard.writeText(
-        `${window.location.origin}/?point=${selected?.id ?? "barcelona"}`,
-      );
-      setShared(true);
-      setTimeout(() => setShared(false), 2500);
-    } catch {
-      setShared(false);
-    }
-  }
-  return (
-    <main className="page-main">
-      <section className="intro">
-        <div className="eyebrow">Одна история. Тысячи дорог.</div>
-        <h1>Найди своих по всему миру</h1>
-        <p>От родных гор до далёких городов — мы ближе, чем кажется.</p>
-      </section>
-      <div className="workspace">
-        <section>
-          <div className="map-toolbar">
-            <SurnameSearch />
-            <Button variant="terra" className="h-12 px-5" onClick={focusForm}>
-              <MapPin />
-              Добавить свою точку
-            </Button>
-            <span className="demo-tag">Одобренные отметки</span>
-          </div>
-          <WorldMap
-            points={points}
-            selected={selected?.id ?? ""}
-            onSelect={(p) => setSelectedId(p.id)}
-          />
-          <div className="map-bottom">
-            <div className="map-stats">
-              <div className="stat">
-                <Globe2 />
-                <strong>{countriesCount}</strong>
-                <span>стран</span>
-              </div>
-              <div className="stat">
-                <MapPin />
-                <strong>{points.length}</strong>
-                <span>отметок</span>
-              </div>
-              <div className="stat">
-                <Users />
-                <strong>{participants}</strong>
-                <span>участников</span>
-              </div>
-            </div>
-            <span className="map-bottom-note">За каждой точкой — своя история</span>
-          </div>
-        </section>
-        <aside className="sidebar">
-          <AddPoint compact />
-          <section className="framed-tool selected-family">
-            <div className="selected-top">
-              <MapPin />
-              <h2>{selected?.family ?? "Свои на карте"}</h2>
-            </div>
-            <div className="title-rule" />
-            {selected&&<><p className="family-location">{selected.city} · {selected.country}</p><WriteButton pointId={selected.id}/></>}
-            <div className="divide-y divide-border">{points.slice(0,5).map(p=><div key={p.id} className="py-2"><Link to="/surname/$slug" params={{slug:p.family.toLocaleLowerCase("ru")}} className="block py-2 text-sm"><strong>{p.family}</strong><br/>{p.country}{p.city?` · ${p.city}`:''}</Link><WriteButton pointId={p.id}/></div>)}</div>
-            <div className="community-line">
-
-              <span>
-                {selected ? "Одобренная отметка участника" : "Одобренных отметок пока нет"}
-              </span>
-            </div>
-            <Button className="w-full h-10" onClick={share} disabled={!selected}>
-              {shared ? <Check /> : <Share2 />}
-              {shared ? "Ссылка скопирована" : "Поделиться находкой"}
-            </Button>
-            {selected ? (
-              <Link to="/surname/$slug" params={{ slug: selected.family.toLocaleLowerCase("ru") }} className="text-link">
-                История фамилии <ArrowRight />
-              </Link>
-            ) : (
-              <Link to="/search" className="text-link">
-                Найти фамилию <ArrowRight />
-              </Link>
-            )}
-          </section>
-        </aside>
-      </div>
-      <section className="connection-band">
-        <HeartHandshake className="connection-icon" />
-        <div className="connection-copy">
-          <h2>Разные города. Одни корни.</h2>
-          <p>Сохраняем связь с родными местами и находим друг друга.</p>
-        </div>
-        <Link to="/about" className="text-link">
-          Больше о проекте <ArrowRight />
-        </Link>
-      </section>
-    </main>
-  );
+import { createFileRoute,Link } from '@tanstack/react-router';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { Search,SlidersHorizontal,Plus,ChevronRight,X,MapPin,Globe2,Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog,DialogContent,DialogHeader,DialogTitle } from '@/components/ui/dialog';
+import { WorldMap } from '@/components/ironkarta/world-map';
+import { AddPoint } from '@/components/ironkarta/add-point';
+import { WriteButton } from '@/components/messaging/write-button';
+import { catalogQuery } from '@/lib/catalog-query';
+import { DataError,DataNotFound } from '@/components/ironkarta/data-boundaries';
+import { pageHead } from '@/data/demo';
+export const Route=createFileRoute('/')({validateSearch:(s:Record<string,unknown>):{point?:string|undefined;q?:string;mode?:'families'|'participants'|'history'}=>({point:typeof s['point']==='string'?s['point']:undefined,q:typeof s['q']==='string'?s['q']:'',mode:s['mode']==='participants'||s['mode']==='history'?s['mode']:'families'}),loader:({context})=>context.queryClient.ensureQueryData(catalogQuery()),head:()=>pageHead('Иронкарта','Цифровая карта Осетии: фамилии, опубликованные истории и одобренные отметки участников.'),component:MapHome,errorComponent:DataError,notFoundComponent:DataNotFound});
+function MapHome(){const {data}=useSuspenseQuery(catalogQuery());const {point,q='',mode='families'}=Route.useSearch();const navigate=Route.useNavigate();const [add,setAdd]=useState(false);const [filters,setFilters]=useState(false);const [country,setCountry]=useState('');const [expanded,setExpanded]=useState(false);
+  const points=data.marks.flatMap(m=>{const f=data.allFamilies.find(f=>f.id===m.family_id);return f?[{...m,family:f.name,slug:f.slug}]:[];}).filter(p=>(!country||p.country===country)&&[p.family,p.city??'',p.country].some(v=>v.toLowerCase().includes(q.toLowerCase()))&&(mode!=='history'||data.cards.some(c=>c.family_id===p.family_id)));
+  const selected=points.find(p=>p.id===point);const countries=[...new Set(data.marks.map(p=>p.country))].sort();
+  return <main className="map-app"><div className="map-search-panel"><label className="app-search"><Search/><input aria-label="Поиск селения или фамилии" placeholder="Поиск селения или фамилии" value={q} onChange={e=>void navigate({search:prev=>({...prev,q:e.target.value,point:undefined}),replace:true})}/><Button variant="ghost" size="icon" aria-label="Фильтры карты" onClick={()=>setFilters(v=>!v)}><SlidersHorizontal/></Button></label><div className="pill-tabs" role="tablist" aria-label="Фильтры карты">{([{id:'families',label:'Фамилии'},{id:'participants',label:'Участники'},{id:'history',label:'История'}] as const).map(t=><Button key={t.id} role="tab" aria-selected={mode===t.id} variant={mode===t.id?'default':'outline'} onClick={()=>void navigate({search:prev=>({...prev,mode:t.id,point:undefined})})}>{t.label}</Button>)}</div>{filters&&<label className="field country-filter"><span>Страна</span><select value={country} onChange={e=>setCountry(e.target.value)}><option value="">Все страны</option>{countries.map(c=><option key={c}>{c}</option>)}</select></label>}</div>
+    <WorldMap points={points} selected={point??''} showPopup={false} onSelect={p=>{setExpanded(false);void navigate({search:prev=>({...prev,point:p.id})});}}/>
+    <section className={`map-bottom-sheet ${expanded?'is-expanded':''}`} aria-label="Карточка карты" onTouchStart={e=>{e.currentTarget.dataset['startY']=String(e.touches[0]?.clientY??0);}} onTouchEnd={e=>{const delta=Number(e.currentTarget.dataset['startY'])-(e.changedTouches[0]?.clientY??0);if(Math.abs(delta)>40)setExpanded(delta>0);}}>
+      <Button variant="ghost" className="sheet-handle" aria-label={expanded?'Свернуть карточку':'Развернуть карточку'} onClick={()=>setExpanded(v=>!v)}><span/></Button>
+      {selected?<><div className="sheet-title"><div className="min-w-0"><h2>{selected.family}</h2><p><MapPin size={14}/>{selected.country}{selected.city?` · ${selected.city}`:''}</p></div><Button variant="ghost" size="icon" aria-label="Закрыть карточку точки" onClick={()=>void navigate({search:prev=>({...prev,point:undefined})})}><X/></Button></div><p className="text-sm text-muted-foreground">{points.filter(p=>p.family_id===selected.family_id&&p.city===selected.city&&p.country===selected.country).length} отметок в этом городе</p><div className="sheet-actions"><Button asChild><Link to="/surname/$slug" params={{slug:selected.slug}}>Страница фамилии<ChevronRight/></Link></Button><WriteButton pointId={selected.id}/></div></>:<><div className="sheet-statistics"><div><Globe2/><strong>{new Set(points.map(p=>p.country)).size}</strong><small>Страны</small></div><div><MapPin/><strong>{points.length}</strong><small>Отметки</small></div><div><Users/><strong>{data.participantCount}</strong><small>Участники</small></div></div><Button className="w-full" onClick={()=>setAdd(true)}><Plus/>Добавить свою точку</Button></>}
+      {expanded&&<div className="sheet-results">{mode==='history'?data.allFamilies.filter(f=>data.cards.some(c=>c.family_id===f.id)&&f.name.toLowerCase().includes(q.toLowerCase())).map(f=><Link key={f.id} className="app-list-row" to="/surname/$slug" params={{slug:f.slug}}><span className="list-copy"><strong>{f.name}</strong><small>{data.cards.find(c=>c.family_id===f.id)?.title}</small></span><ChevronRight/></Link>):points.map(p=><Link key={p.id} className="app-list-row" to="/surname/$slug" params={{slug:p.slug}}><span className="list-copy"><strong>{p.family}</strong><small>{p.country} · {p.city}</small></span><ChevronRight/></Link>)}{!points.length&&<p className="app-empty">Пока нет данных — дополните историю</p>}</div>}
+    </section><Dialog open={add} onOpenChange={setAdd}><DialogContent className="point-dialog"><DialogHeader><DialogTitle>Своя отметка на карте</DialogTitle></DialogHeader><AddPoint/></DialogContent></Dialog>
+  </main>;
 }
