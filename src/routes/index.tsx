@@ -17,7 +17,7 @@ import { demoPoints, pageHead } from "@/data/demo";
 
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>): { point?: string } =>
-    typeof search.point === "string" ? { point: search.point } : {},
+    typeof search["point"] === "string" ? { point: search["point"] } : {},
   head: () =>
     pageHead(
       "Найди своих по всему миру",
