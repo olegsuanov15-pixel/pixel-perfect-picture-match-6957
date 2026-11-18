@@ -79,6 +79,9 @@
 
 :root {
   --radius: 0.5rem;
+  --source-tradition: oklch(0.947 0.027 130);
+  --source-alternative: oklch(0.954 0.024 48);
+  --source-document: oklch(0.962 0.012 85);
   --terra: oklch(0.59 0.13 39);
   --ocean: oklch(0.9 0.04 214);
   --land: oklch(0.77 0.065 125);
@@ -117,6 +120,9 @@
 }
 
 .dark {
+  --source-tradition: oklch(0.28 0.03 130);
+  --source-alternative: oklch(0.28 0.03 48);
+  --source-document: oklch(0.28 0.012 85);
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.208 0.042 265.755);
@@ -1117,3 +1123,55 @@ h1 {
 .chat-message-own { align-self:flex-end; background:var(--secondary); }
 .messaging-empty { display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px; }
 @media(max-width:700px) { .messaging-layout {grid-template-columns:minmax(0,1fr); min-height:440px;} .messaging-list-hidden {display:none;} .messaging-chat {height: min(720px,80dvh); min-height:440px;} .messaging-empty {display:none;} .chat-scroll {padding:12px;} .chat-message {max-width:94%;} }
+
+/* Surname editorial pages retain the shared landscape and typography. */
+.surname-page { max-width: 1200px; }
+.surname-heading { padding: 28px 0 32px; }
+.surname-heading h1 { font-size: 44px; font-weight: 800; margin: 8px 0 10px; }
+.surname-heading p { color: var(--muted-foreground); font-size: 15px; margin-bottom: 20px; }
+.surname-chip { border-radius: 24px; }
+.surname-section { margin: 0 0 38px; scroll-margin-top: 24px; }
+.surname-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; }
+.surname-source { padding: 24px; border-radius: 8px; border: 1px solid var(--border); display: flex; flex-direction: column; min-width: 0; }
+.source-tradition { background: var(--source-tradition); }
+.source-alternative { background: var(--source-alternative); }
+.source-document { background: var(--source-document); }
+.source-type { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-bottom: 14px; font-size: 11px; }
+.source-type > span { font-weight: 700; border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; }
+.source-type small { color: var(--muted-foreground); font-size: 11px; }
+.surname-source h3 { font-size: 18px; font-weight: 800; line-height: 1.45; margin-bottom: 12px; overflow-wrap: anywhere; }
+.surname-source > p { font-size: 13px; line-height: 1.9; margin-bottom: 20px; overflow-wrap: anywhere; }
+.surname-citation { display: flex; gap: 8px; align-items: flex-start; margin-top: auto; font-size: 11px; color: var(--muted-foreground); }
+.surname-citation a { color: var(--foreground); display: flex; gap: 7px; min-width: 0; overflow-wrap: anywhere; }
+.surname-citation svg { flex-shrink: 0; margin-top: 2px; }
+.surname-citation small { display: block; color: var(--muted-foreground); margin-top: 3px; }
+.surname-note { display: flex; gap: 9px; color: var(--muted-foreground); font-size: 12px; margin-top: 18px; line-height: 1.7; }
+.surname-note svg { flex-shrink: 0; margin-top: 2px; }
+.surname-roots { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 25px 0; }
+.roots-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; }
+.roots-grid h3 { font-size: 13px; font-weight: 700; margin: 16px 0 12px; }
+.root-village { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 8px 0; }
+.root-village svg { flex-shrink: 0; color: var(--terra); }
+.root-region { font-size: 12px; color: var(--muted-foreground); margin-top: 14px; }
+.related-placeholder { padding: 6px 12px; font-size: 12px; border: 1px solid var(--border); border-radius: 6px; color: var(--muted-foreground); }
+.surname-map { margin-top: 18px; }
+.surname-map .world-map { width: 100%; max-width: 700px; height: 350px; min-height: 0; aspect-ratio: auto; }
+.surname-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; border-top: 1px solid var(--border); padding: 22px 0; }
+.story-dialog { max-height: 90dvh; overflow-y: auto; }
+.story-dialog textarea,.surname-editor textarea { width: 100%; border: 1px solid var(--input); border-radius: 6px; background: var(--background); padding: 12px; }
+.consent-line { display: flex; align-items: flex-start; gap: 9px; font-size: 12px; line-height: 1.6; }
+.consent-line input { margin-top: 4px; flex-shrink: 0; }
+.story-action { white-space: normal; height: auto; min-height: 36px; }
+.surname-admin-list { display: flex; flex-wrap: wrap; gap: 12px; padding: 24px 0; }
+.surname-editor { max-width: 100%; }
+.card-editor { border-block: 1px solid var(--border); padding: 24px 0; margin-bottom: 24px; }
+@media(max-width: 700px) {
+ .surname-heading h1 { font-size: 34px; }
+ .surname-heading { padding: 22px 0 28px; }
+ .surname-grid,.roots-grid { grid-template-columns: minmax(0,1fr); }
+ .surname-source { padding: 20px; }
+ .surname-map .world-map { height: 250px; }
+ .surname-actions > svg { display: none; }
+ .surname-actions { flex-direction: column; align-items: stretch; }
+ .surname-citation { flex-wrap: wrap; }
+}

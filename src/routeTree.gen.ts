@@ -25,6 +25,7 @@ import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as FamilySlugRouteImport } from './routes/family.$slug'
+import { Route as SurnameSlugRouteImport } from './routes/surname.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -105,6 +106,11 @@ const FamilySlugRoute = FamilySlugRouteImport.update({
   path: '/family/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SurnameSlugRoute = SurnameSlugRouteImport.update({
+  id: '/surname/$slug',
+  path: '/surname/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/moderation': typeof AuthenticatedModerationRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/family/$slug': typeof FamilySlugRoute
+  '/surname/$slug': typeof SurnameSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/moderation': typeof AuthenticatedModerationRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/family/$slug': typeof FamilySlugRoute
+  '/surname/$slug': typeof SurnameSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/family/$slug': typeof FamilySlugRoute
+  '/surname/$slug': typeof SurnameSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/moderation'
     | '/profile'
     | '/family/$slug'
+    | '/surname/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/moderation'
     | '/profile'
     | '/family/$slug'
+    | '/surname/$slug'
   id:
     | '__root__'
     | '/'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/_authenticated/moderation'
     | '/_authenticated/profile'
     | '/family/$slug'
+    | '/surname/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -227,6 +239,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   StoriesRoute: typeof StoriesRoute
   FamilySlugRoute: typeof FamilySlugRoute
+  SurnameSlugRoute: typeof SurnameSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -343,6 +356,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FamilySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/surname/$slug': {
+      id: '/surname/$slug'
+      path: '/surname/$slug'
+      fullPath: '/surname/$slug'
+      preLoaderRoute: typeof SurnameSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -376,6 +396,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   StoriesRoute: StoriesRoute,
   FamilySlugRoute: FamilySlugRoute,
+  SurnameSlugRoute: SurnameSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

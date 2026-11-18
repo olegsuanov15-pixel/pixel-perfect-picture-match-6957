@@ -114,7 +114,7 @@ function Index() {
             </div>
             <div className="title-rule" />
             {selected&&<><p className="family-location">{selected.city} · {selected.country}</p><WriteButton pointId={selected.id}/></>}
-            <div className="divide-y divide-border">{points.slice(0,5).map(p=><div key={p.id} className="py-2"><Link to="/family/$slug" params={{slug:p.slug}} className="block py-2 text-sm"><strong>{p.family}</strong><br/>{p.country}{p.city?` · ${p.city}`:''}</Link><WriteButton pointId={p.id}/></div>)}</div>
+            <div className="divide-y divide-border">{points.slice(0,5).map(p=><div key={p.id} className="py-2"><Link to="/surname/$slug" params={{slug:p.family.toLocaleLowerCase("ru")}} className="block py-2 text-sm"><strong>{p.family}</strong><br/>{p.country}{p.city?` · ${p.city}`:''}</Link><WriteButton pointId={p.id}/></div>)}</div>
             <div className="community-line">
 
               <span>
@@ -126,7 +126,7 @@ function Index() {
               {shared ? "Ссылка скопирована" : "Поделиться находкой"}
             </Button>
             {selected ? (
-              <Link to="/family/$slug" params={{ slug: selected.slug }} className="text-link">
+              <Link to="/surname/$slug" params={{ slug: selected.family.toLocaleLowerCase("ru") }} className="text-link">
                 История фамилии <ArrowRight />
               </Link>
             ) : (

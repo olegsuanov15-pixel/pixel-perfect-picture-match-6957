@@ -44,4 +44,5 @@ use the editor.
 - Share one signed-in Realtime subscription in the account menu and invalidate messaging queries; this keeps unread badges and active chats synchronized without duplicate channels.
 - Expose participant contact fields only through authenticated narrow RPCs and sign peer avatars after inbox authorization; email and private profiles must never reach public pages.
 - Enforce rolling messaging frequency limits in write triggers using one per-account transaction lock and private event rows; requests, retries and first messages must share atomic rollback-safe enforcement across all dialogs.
+- Share the surname view between the canonical Cyrillic surname URL and legacy family URLs; public cards use published-only RLS, editorial writes require server-verified admin, and guest stories use validated server writes with a private atomic frequency gate.
 <!-- AGENT-MEMORY:END -->

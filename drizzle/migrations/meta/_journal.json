@@ -71,6 +71,13 @@
       "when": 1794996786877,
       "tag": "0009_account_messaging_frequency_limits",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794997360098,
+      "tag": "0010_surname_editor_and_submissions",
+      "breakpoints": true
     }
   ]
 }

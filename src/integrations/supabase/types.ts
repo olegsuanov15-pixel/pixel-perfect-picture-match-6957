@@ -189,6 +189,41 @@ export type Database = {
         }
         Relationships: []
       }
+      family_details: {
+        Row: {
+          family_id: string
+          home_villages: string[]
+          region: string
+          related_family_ids: string[]
+          related_family_names: string[]
+          updated_at: string
+        }
+        Insert: {
+          family_id: string
+          home_villages?: string[]
+          region?: string
+          related_family_ids?: string[]
+          related_family_names?: string[]
+          updated_at?: string
+        }
+        Update: {
+          family_id?: string
+          home_villages?: string[]
+          region?: string
+          related_family_ids?: string[]
+          related_family_names?: string[]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_details_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: true
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       family_histories: {
         Row: {
           body: string
@@ -600,6 +635,141 @@ export type Database = {
           },
         ]
       }
+      story_submission_limits: {
+        Row: {
+          bucket: string
+          last_submission: string
+        }
+        Insert: {
+          bucket: string
+          last_submission: string
+        }
+        Update: {
+          bucket?: string
+          last_submission?: string
+        }
+        Relationships: []
+      }
+      story_submissions: {
+        Row: {
+          contact_consent: boolean
+          created_at: string
+          family_id: string
+          id: string
+          kind: string
+          processing_consent_at: string
+          source_url: string
+          status: string
+          text: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          contact_consent?: boolean
+          created_at?: string
+          family_id: string
+          id?: string
+          kind: string
+          processing_consent_at?: string
+          source_url?: string
+          status?: string
+          text: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          contact_consent?: boolean
+          created_at?: string
+          family_id?: string
+          id?: string
+          kind?: string
+          processing_consent_at?: string
+          source_url?: string
+          status?: string
+          text?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_submissions_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "story_submissions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      surname_cards: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          family_id: string
+          id: string
+          origin: string
+          sort_order: number
+          source_title: string
+          source_url: string
+          status: string
+          summary: string
+          title: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          family_id: string
+          id?: string
+          origin?: string
+          sort_order?: number
+          source_title?: string
+          source_url?: string
+          status?: string
+          summary: string
+          title: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          family_id?: string
+          id?: string
+          origin?: string
+          sort_order?: number
+          source_title?: string
+          source_url?: string
+          status?: string
+          summary?: string
+          title?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "surname_cards_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "surname_cards_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_blocks: {
         Row: {
           blocked_id: string
@@ -667,6 +837,7 @@ export type Database = {
       can_contact_participant: { Args: { _target: string }; Returns: boolean }
       can_read_conversation: { Args: { _id: string }; Returns: boolean }
       claim_point_slot: { Args: { _bucket: string }; Returns: boolean }
+      claim_story_slot: { Args: { _bucket: string }; Returns: boolean }
       decide_conversation: {
         Args: { _conversation: string; _decision: string }
         Returns: undefined

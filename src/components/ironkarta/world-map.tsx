@@ -1,3 +1,4 @@
+import {Link} from '@tanstack/react-router';
 import {WriteButton} from '@/components/messaging/write-button';
 import { useState } from "react";
 import { MapPin, Plus, Minus, Maximize } from "lucide-react";
@@ -65,7 +66,7 @@ export function WorldMap({
             </Button>
           ))}
       </div>
-      {points.find(p=>p.id===selected)&&<div className="absolute bottom-14 left-4 z-20"><WriteButton pointId={selected}/></div>}
+      {points.filter(p=>p.id===selected).map(p=><div key={p.id} className="absolute bottom-14 left-4 z-20 rounded-md border border-border bg-background p-3"><Link to="/surname/$slug" params={{slug:p.family.toLocaleLowerCase('ru')}} className="block font-bold text-sm">{p.family}</Link><WriteButton pointId={selected}/></div>)}
       <div className="map-controls">
         <Button
           variant="ghost"

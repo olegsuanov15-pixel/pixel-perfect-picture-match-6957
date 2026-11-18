@@ -41,7 +41,7 @@ function SearchPage() {
       </div>
       <section className="family-results">
         {data.families.map((f) => (
-          <Link key={f.id} to="/family/$slug" params={{ slug: f.slug }} className="family-entry">
+          <Link key={f.id} to="/surname/$slug" params={{ slug: f.name.toLocaleLowerCase("ru") }} className="family-entry">
             <h2>{f.name}</h2>
             <p>История по источникам и отметки участников</p>
             <span className="text-link">
