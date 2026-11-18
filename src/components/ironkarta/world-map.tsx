@@ -1,7 +1,7 @@
 import {Link} from '@tanstack/react-router';
 import {WriteButton} from '@/components/messaging/write-button';
 import { useState,useRef } from "react";
-import { MapPin, Plus, Minus, Maximize } from "lucide-react";
+import { MapPin, Plus, Minus, Globe2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import countries from "@/data/world.json";
 export type MapPoint = {
@@ -26,14 +26,15 @@ export function WorldMap({
   showPopup?: boolean;
 }) {
   const [zoom, setZoom] = useState(1);
-  const [pan,setPan]=useState({x:0,y:0});const drag=useRef<{x:number;y:number;px:number;py:number}|null>(null);
+  const [pan,setPan]=useState({x:0,y:0});const drag=useRef<{x:number;y:number;px:number;py:number}|null>(null);const touches=useRef(new Map<number,{x:number;y:number}>());const pinch=useRef<{d:number;z:number}|null>(null);
+  const distance=()=>{const [a,b]=[...touches.current.values()];return a&&b?Math.hypot(a.x-b.x,a.y-b.y):0;};
 
   return (
     <div className={`world-map zoom-${zoom}`} aria-label="Карта мира с одобренными отметками">
       <div className="map-layer" style={{transform:`translate(calc(-50% + ${pan.x}px),calc(-50% + ${pan.y}px)) scale(${1+(zoom-1)*0.4})`}}
- onPointerDown={e=>{if(e.target instanceof Element&&e.target.closest('button'))return;drag.current={x:e.clientX,y:e.clientY,px:pan.x,py:pan.y};e.currentTarget.setPointerCapture(e.pointerId);}}
- onPointerMove={e=>{if(drag.current)setPan({x:drag.current.px+e.clientX-drag.current.x,y:drag.current.py+e.clientY-drag.current.y});}}
- onPointerUp={()=>{drag.current=null;}} onPointerCancel={()=>{drag.current=null;}}>
+ onPointerDown={e=>{touches.current.set(e.pointerId,{x:e.clientX,y:e.clientY});if(touches.current.size===2){drag.current=null;pinch.current={d:distance(),z:zoom};return;}if(e.target instanceof Element&&e.target.closest('button'))return;drag.current={x:e.clientX,y:e.clientY,px:pan.x,py:pan.y};e.currentTarget.setPointerCapture(e.pointerId);}}
+ onPointerMove={e=>{if(touches.current.has(e.pointerId))touches.current.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pinch.current&&touches.current.size===2){const d=distance();if(pinch.current.d)setZoom(Math.max(1,Math.min(3,Math.round(pinch.current.z*d/pinch.current.d))));return;}if(drag.current)setPan({x:drag.current.px+e.clientX-drag.current.x,y:drag.current.py+e.clientY-drag.current.y});}}
+ onPointerUp={e=>{touches.current.delete(e.pointerId);pinch.current=null;drag.current=null;}} onPointerCancel={e=>{touches.current.delete(e.pointerId);pinch.current=null;drag.current=null;}}>
         <svg
           className="geography"
           viewBox="0 0 1000 500"
@@ -44,11 +45,6 @@ export function WorldMap({
             <path key={c.name} d={c.path} className="country" />
           ))}
         </svg>
-        <span className="map-label label-america">Северная Америка</span>
-        <span className="map-label label-europe">Европа</span>
-        <span className="map-label label-asia">Азия</span>
-        <span className="map-label label-africa">Африка</span>
-        <span className="map-label label-oceania">Австралия</span>
         {points
           .filter((p) => p.latitude !== null && p.longitude !== null)
           .map((p) => (
@@ -98,11 +94,12 @@ export function WorldMap({
         <Button
           variant="ghost"
           size="icon"
-          title="Центрировать карту"
-          aria-label="Центрировать карту"
+          title="Весь мир"
+          aria-label="Весь мир"
+          className="map-reset"
           onClick={() => {setZoom(1);setPan({x:0,y:0});}}
         >
-          <Maximize />
+          <Globe2 />
         </Button>
       </div>
       <div className="map-legend">
