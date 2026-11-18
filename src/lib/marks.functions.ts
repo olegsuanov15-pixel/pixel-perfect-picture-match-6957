@@ -3,6 +3,7 @@ import {getRequestHeader,getRequestIP} from '@tanstack/react-start/server';
 import {requireSupabaseAuth} from '@/integrations/supabase/auth-middleware';
 import {markSubmission,profileInput,reviewInput} from './marks-rules';
 import {z} from 'zod';
+import {resolveCoordinates} from './coordinate-resolution';
 export const submitMark=createServerFn({method:'POST'}).inputValidator((v:unknown)=>markSubmission.parse(v)).handler(async({data})=>{
  if(data.website)throw new Error('Не удалось отправить заявку');
  const {supabaseAdmin:db}=await import('@/integrations/supabase/client.server');
@@ -34,8 +35,8 @@ export const getModeration=createServerFn({method:'GET'}).middleware([requireSup
 export const reviewMark=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator((v:unknown)=>reviewInput.parse(v)).handler(async({data,context})=>{
  const role=await context.supabase.rpc('has_role',{_user_id:context.userId,_role:'admin'});if(!role.data)throw new Error('Нет прав администратора');
  const {supabaseAdmin:db}=await import('@/integrations/supabase/client.server');const row=await db.from('map_points').select('country,city,status,consent_to_publish').eq('id',data.id).single();if(!row.data||row.data.status!=='pending')throw new Error('Заявка уже рассмотрена');
- let coords={latitude:null as number|null,longitude:null as number|null};if(data.decision==='approved'){if(!row.data.consent_to_publish)throw new Error('Нет согласия на показ');const {cityCoordinates}=await import('./map-points.server');coords=await cityCoordinates(row.data.country,row.data.city);}
- const {data:rows,error}=await db.from('map_points').update({status:data.decision,...coords,moderation_note:data.note||null,reviewed_at:new Date().toISOString(),reviewed_by:context.userId}).eq('id',data.id).eq('status','pending').select('id');if(error||!rows?.length)throw new Error('Решение не сохранено');return {saved:true};
+ let coords={latitude:null as number|null,longitude:null as number|null};let coordinateSource='none';if(data.decision==='approved'){if(!row.data.consent_to_publish)throw new Error('Нет согласия на показ');const {cityCoordinates}=await import('./map-points.server');const resolved=await resolveCoordinates(row.data.country,()=>row.data.city?cityCoordinates(row.data.country,row.data.city):Promise.resolve(null),data.coordinates);if(!resolved.coordinates)return {saved:false,manualRequired:true,coordinateSource:resolved.source};coords=resolved.coordinates;coordinateSource=resolved.source;}
+ const {data:rows,error}=await db.from('map_points').update({status:data.decision,...coords,moderation_note:data.note||null,reviewed_at:new Date().toISOString(),reviewed_by:context.userId}).eq('id',data.id).eq('status','pending').select('id');if(error||!rows?.length)throw new Error('Решение не сохранено');return {saved:true,manualRequired:false,coordinateSource};
 });
 export const deleteAccount=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).handler(async({context})=>{
  const {supabaseAdmin:db}=await import('@/integrations/supabase/client.server');const files=await db.storage.from('participant-avatars').list(context.userId);if(files.data?.length){const removed=await db.storage.from('participant-avatars').remove(files.data.map(f=>`${context.userId}/${f.name}`));if(removed.error)throw new Error('Не удалось удалить фото');}
