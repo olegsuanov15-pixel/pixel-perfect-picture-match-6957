@@ -36,4 +36,5 @@ use the editor.
 - Render maps from simplified Natural Earth geometry and coordinate-positioned approved markers, so no map credentials or tile requests are needed.
 - Public readers use the narrow public_map_points function, which exposes only approved city-level marks with consent and excludes hidden profiles; profile details and guest deletion capabilities remain private.
 - Geocode structured city/country components only through an authenticated admin action and cache centers; never accept participant coordinates or precise addresses.
+- Keep profile drafts in the edit form and await participant-query refresh before switching to the read-only view, so saved details and avatar stay current; mount toast notifications once in the root shell.
 <!-- AGENT-MEMORY:END -->
