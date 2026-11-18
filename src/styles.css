@@ -1106,3 +1106,4 @@ h1 {
 .google-sign-in { background: var(--google-background); color: var(--google-foreground); border-color: var(--google-border); }
 :root { --google-background: #ffffff; --google-foreground: #1f1f1f; --google-border: #747775; }
 .google-sign-in svg { width: 18px; height: 18px; }
+.honeypot { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }

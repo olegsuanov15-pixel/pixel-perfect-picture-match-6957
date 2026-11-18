@@ -1,0 +1,4 @@
+ALTER TABLE public.profiles ADD CONSTRAINT profile_field_lengths CHECK(length(display_name)<=80 AND length(family_name)<=100 AND length(country)<=100 AND length(city)<=120);
+ALTER TABLE public.map_points ADD CONSTRAINT map_point_location_lengths CHECK(length(btrim(country)) BETWEEN 1 AND 100 AND length(coalesce(city,''))<=120);
+CREATE OR REPLACE FUNCTION public.create_participant_profile() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$ BEGIN INSERT INTO public.profiles(id) VALUES(NEW.id) ON CONFLICT DO NOTHING; IF NEW.raw_user_meta_data->>'processing_consent'='true' THEN INSERT INTO public.registration_consents(user_id) VALUES(NEW.id) ON CONFLICT DO NOTHING; END IF; RETURN NEW; END $$;
+REVOKE ALL ON FUNCTION public.create_participant_profile() FROM PUBLIC,anon,authenticated;

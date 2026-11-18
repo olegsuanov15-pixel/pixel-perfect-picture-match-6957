@@ -37,7 +37,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   const { point } = Route.useSearch();
   const { data } = useSuspenseQuery(catalogQuery());
-  const points = data.marks.flatMap((mark) => {
+  const points = [...data.marks].sort((a,b)=>b.created_at.localeCompare(a.created_at)).flatMap((mark) => {
     const family = data.families.find((f) => f.id === mark.family_id);
     return family ? [{ ...mark, family: family.name, slug: family.slug }] : [];
   });
@@ -112,15 +112,10 @@ function Index() {
               <h2>{selected?.family ?? "Свои на карте"}</h2>
             </div>
             <div className="title-rule" />
-            <p className="family-location">
-              {selected?.city} · {selected?.country}
-            </p>
+            {selected&&<p className="family-location">{selected.city} · {selected.country}</p>}
+            <div className="divide-y divide-border">{points.slice(0,5).map(p=><Link key={p.id} to="/family/$slug" params={{slug:p.slug}} className="block py-2 text-sm"><strong>{p.family}</strong><br/>{p.country}{p.city?` · ${p.city}`:''}</Link>)}</div>
             <div className="community-line">
-              <div className="avatar-stack">
-                <span>А</span>
-                <span>М</span>
-                <span>С</span>
-              </div>
+
               <span>
                 {selected ? "Одобренная отметка участника" : "Одобренных отметок пока нет"}
               </span>

@@ -18,23 +18,11 @@ export const getCatalog = createServerFn({ method: "GET" })
       families.push(...response.data);
       if (response.data.length < 1000) break;
     }
-    const marks = [];
-    for (let offset = 0; ; offset += 1000) {
-      const response = await db
-        .from("participant_marks")
-        .select("id,family_id,country,city,latitude,longitude,status,consent_to_publish")
-        .eq("status", "approved")
-        .eq("consent_to_publish", true)
-        .order("id")
-        .range(offset, offset + 999);
-      if (response.error) throw new Error(response.error.message);
-      marks.push(...response.data);
-      if (response.data.length < 1000) break;
-    }
-    return {
-      families: families.filter((f) => matchesSurname(f, data.q)),
-      marks: publicMarks(marks),
-    };
+    const response=await db.rpc("public_map_points");
+    if(response.error)throw new Error(response.error.message);
+    const marks=publicMarks(response.data);
+    const visibleIds=new Set(marks.map(m=>m.family_id));
+    return {families:families.filter(f=>visibleIds.has(f.id)&&matchesSurname(f,data.q)),marks};
   });
 export const getFamily = createServerFn({ method: "GET" })
   .inputValidator((input: unknown) =>
@@ -67,19 +55,7 @@ export const getFamily = createServerFn({ method: "GET" })
       .eq("published", true)
       .order("created_at");
     if (historyResponse.error) throw new Error(historyResponse.error.message);
-    const marks = [];
-    for (let offset = 0; ; offset += 1000) {
-      const response = await db
-        .from("participant_marks")
-        .select("id,family_id,country,city,latitude,longitude,status,consent_to_publish")
-        .eq("family_id", family.id)
-        .eq("status", "approved")
-        .eq("consent_to_publish", true)
-        .order("id")
-        .range(offset, offset + 999);
-      if (response.error) throw new Error(response.error.message);
-      marks.push(...response.data);
-      if (response.data.length < 1000) break;
-    }
-    return { family, histories: sourcedHistories(historyResponse.data), marks: publicMarks(marks) };
+    const response=await db.rpc("public_map_points");
+    if(response.error)throw new Error(response.error.message);
+    return {family,histories:sourcedHistories(historyResponse.data),marks:publicMarks(response.data).filter(m=>m.family_id===family.id)};
   });

@@ -29,10 +29,11 @@ use the editor.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
 <!-- AGENT-MEMORY:BEGIN -->
-- Read public catalog through Query-backed loaders; submit participant marks as authenticated owner-scoped pending rows so no submission publishes directly.
-- Keep moderator roles in user_roles and validate them server-side and through RLS; record each pending-to-approved/rejected decision so public data cannot be changed by participants.
+- Submit guest and authenticated map_points through validated server functions with pending status, explicit consents, a honeypot and an atomic database frequency gate; derive signed-in identity from the verified bearer.
+- Only admin roles in user_roles may moderate; validate has_role server-side before privileged reads or writes, never trust client role values.
 - Keep profiles and avatar storage owner-private; signed-in pages live under the client-only authenticated layout because browser sessions are unavailable during SSR.
 - Share the header, mountain artwork and footer in the root shell; use separate content routes with individual metadata for discoverable navigation.
 - Render maps from simplified Natural Earth geometry and coordinate-positioned approved markers, so no map credentials or tile requests are needed.
-- Public readers use a publishable server client with RLS and explicit safe columns; require approved status and consent for marks and published source citations for history.
+- Public readers use the narrow public_map_points function, which exposes only approved city-level marks with consent and excludes hidden profiles; profile details and guest deletion capabilities remain private.
+- Geocode structured city/country components only through an authenticated admin action and cache centers; never accept participant coordinates or precise addresses.
 <!-- AGENT-MEMORY:END -->

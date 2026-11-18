@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      city_geocodes: {
+        Row: {
+          latitude: number
+          location_key: string
+          longitude: number
+        }
+        Insert: {
+          latitude: number
+          location_key: string
+          longitude: number
+        }
+        Update: {
+          latitude?: number
+          location_key?: string
+          longitude?: number
+        }
+        Relationships: []
+      }
       families: {
         Row: {
           aliases: string[]
@@ -139,6 +157,68 @@ export type Database = {
         }
         Relationships: []
       }
+      map_points: {
+        Row: {
+          city: string | null
+          consent_to_publish: boolean
+          country: string
+          created_at: string
+          family_id: string
+          guest_delete_token: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          moderation_note: string | null
+          processing_consent_at: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          city?: string | null
+          consent_to_publish?: boolean
+          country: string
+          created_at?: string
+          family_id: string
+          guest_delete_token?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          moderation_note?: string | null
+          processing_consent_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          city?: string | null
+          consent_to_publish?: boolean
+          country?: string
+          created_at?: string
+          family_id?: string
+          guest_delete_token?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          moderation_note?: string | null
+          processing_consent_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_points_family_id_fkey"
+            columns: ["family_id"]
+            isOneToOne: false
+            referencedRelation: "families"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       participant_marks: {
         Row: {
           city: string | null
@@ -195,24 +275,72 @@ export type Database = {
           },
         ]
       }
-      profiles: {
+      point_submission_limits: {
         Row: {
-          avatar_path: string | null
-          created_at: string
-          display_name: string
-          id: string
+          bucket: string
+          last_submission: string
         }
         Insert: {
-          avatar_path?: string | null
-          created_at?: string
-          display_name?: string
-          id: string
+          bucket: string
+          last_submission: string
         }
         Update: {
+          bucket?: string
+          last_submission?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          about: string
+          avatar_path: string | null
+          city: string
+          country: string
+          created_at: string
+          display_name: string
+          family_name: string
+          id: string
+          processing_consent_at: string | null
+          show_on_map: boolean
+        }
+        Insert: {
+          about?: string
           avatar_path?: string | null
+          city?: string
+          country?: string
           created_at?: string
           display_name?: string
+          family_name?: string
+          id: string
+          processing_consent_at?: string | null
+          show_on_map?: boolean
+        }
+        Update: {
+          about?: string
+          avatar_path?: string | null
+          city?: string
+          country?: string
+          created_at?: string
+          display_name?: string
+          family_name?: string
           id?: string
+          processing_consent_at?: string | null
+          show_on_map?: boolean
+        }
+        Relationships: []
+      }
+      registration_consents: {
+        Row: {
+          accepted_at: string
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -239,12 +367,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_point_slot: { Args: { _bucket: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      public_map_points: {
+        Args: never
+        Returns: {
+          city: string
+          consent_to_publish: boolean
+          country: string
+          created_at: string
+          family_id: string
+          id: string
+          latitude: number
+          longitude: number
+          status: string
+        }[]
       }
     }
     Enums: {

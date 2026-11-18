@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Heart, ArrowUpRight } from "lucide-react";
-import { useParticipant } from "@/hooks/use-participant";
+import { AccountMenu } from "./account-menu";
 
 export function Ornament() {
   return (
@@ -22,7 +22,7 @@ export function Ornament() {
   );
 }
 export function SiteHeader() {
-  const {user}=useParticipant();
+
   return (
     <header className="site-header">
       <Link to="/" className="brand">
@@ -40,7 +40,7 @@ export function SiteHeader() {
         <Link to="/about" className="nav-link">
           О проекте
         </Link>
-        <Link to={user ? '/profile' : '/auth'} className="nav-link">{user ? 'Мой профиль' : 'Войти'}</Link>
+        <AccountMenu/>
       </nav>
       <span className="header-note">
         <Heart size={13} /> Из Осетии. С любовью.
@@ -54,7 +54,7 @@ export function SiteFooter() {
       <span>
         <span className="footer-brand">Иронкарта</span> · Связь, которая не знает границ
       </span>
-      <span>Иронкарта · 2026</span>
+      <Link to="/privacy">Конфиденциальность</Link>
       <Link to="/about" className="inline-flex items-center gap-1">
         Сделано с любовью к своим <ArrowUpRight size={12} />
       </Link>

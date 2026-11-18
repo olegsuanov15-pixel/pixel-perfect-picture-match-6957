@@ -18,7 +18,7 @@ export function matchesSurname(family: FamilyRecord, query: string) {
     normalizeSurname(name).includes(normalized),
   );
 }
-export function publicMarks(marks: MarkRecord[]) {
+export function publicMarks<T extends MarkRecord>(marks: T[]) {
   return marks.filter((mark) => mark.status === "approved" && mark.consent_to_publish);
 }
 export function sourcedHistories<
