@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState, type FormEvent } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { LovableMark } from '@lovable.dev/cloud-auth-js/react';
 import { Button } from '@/components/ui/button';
 import { GoogleButton, AuthDivider } from '@/components/ironkarta/google-button';
 import { useSocialLogin } from '@/hooks/use-social-login';
@@ -33,7 +32,6 @@ function Auth() {
       <AuthDivider />
       <form onSubmit={emailLogin}><label className="field"><span>Email</span><input name="email" type="email" autoComplete="email" required /></label><label className="field"><span>Пароль</span><input name="password" type="password" autoComplete="current-password" required /></label><Button type="submit" className="w-full" disabled={busy || social.busy}>Войти</Button></form>
       <div className="my-4 flex flex-wrap justify-between gap-3"><Link to="/register" search={{ returnTo }}>Регистрация</Link><Link to="/forgot-password">Забыли пароль?</Link></div>
-      <Button variant="outline" className="w-full" disabled={busy || social.busy} onClick={() => void social.signIn('lovable')}><LovableMark />Продолжить с Lovable</Button>
     </>}
     {(error || social.error) && <p role="alert">{error || social.error}</p>}
   </section></main>;

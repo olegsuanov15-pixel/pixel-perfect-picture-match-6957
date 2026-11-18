@@ -14,7 +14,7 @@ export function useSocialLogin(returnTo: string) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   useEffect(() => {
-    if (!user || !sessionStorage.getItem(OAUTH_PENDING_KEY)) return;
+    if (!user || sessionStorage.getItem(OAUTH_PENDING_KEY) !== 'google') return;
     let active = true;
     setBusy(true);
     void qc.fetchQuery(participantQuery()).then(data => {
@@ -27,12 +27,12 @@ export function useSocialLogin(returnTo: string) {
       .finally(() => { if (active) setBusy(false); });
     return () => { active = false; };
   }, [user?.id, qc, navigate, returnTo]);
-  async function signIn(provider: 'google' | 'lovable' = 'google') {
+  async function signIn() {
     setBusy(true); setError('');
     sessionStorage.setItem(AUTH_RETURN_KEY, safeReturnPath(returnTo));
-    sessionStorage.setItem(OAUTH_PENDING_KEY, provider);
+    sessionStorage.setItem(OAUTH_PENDING_KEY, 'google');
     try {
-      const result = await lovable.auth.signInWithOAuth(provider, { redirect_uri: `${window.location.origin}/auth` });
+      const result = await lovable.auth.signInWithOAuth('google', { redirect_uri: `${window.location.origin}/auth` });
       if (result.error) throw result.error;
       if (result.redirected) return;
       // Session is installed by the broker before user identity triggers completion.
