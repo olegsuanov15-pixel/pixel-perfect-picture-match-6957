@@ -11,6 +11,8 @@ import { participantQuery } from '@/lib/participant-query';
 import { saveProfile, deleteAccount } from '@/lib/marks.functions';
 import { initialProfileMode, profileInitials } from '@/lib/profile-view';
 import { pageHead } from '@/data/demo';
+import { useParticipant } from '@/hooks/use-participant';
+import { googleDisplayName } from '@/lib/auth-flow';
 
 export const Route = createFileRoute('/_authenticated/profile')({
   head: () => pageHead('Профиль', 'Личные данные участника и управление показом на карте.'),
@@ -23,6 +25,7 @@ const statuses = {
   rejected: { label: 'Отклонена', icon: XCircle, color: 'text-destructive bg-destructive/10' },
 };
 function Profile() {
+  const { user } = useParticipant();
   const { data } = useSuspenseQuery(participantQuery());
   const qc = useQueryClient();
   const navigate = useNavigate();
@@ -96,7 +99,7 @@ function Profile() {
         <form onSubmit={submit} className="max-w-md">
           <fieldset disabled={mutation.isPending || deletion.isPending}>
             {data.avatarUrl && <img src={data.avatarUrl} alt="Фото профиля" className="mb-4 size-20 rounded-full object-cover" />}
-            <label className="field"><span>Имя</span><input name="name" maxLength={80} defaultValue={profile?.display_name ?? ''} /></label>
+            <label className="field"><span>Имя</span><input name="name" maxLength={80} defaultValue={profile?.display_name || (initialProfileMode(profile) === 'edit' && user?.app_metadata['provider'] === 'google' ? googleDisplayName(user.user_metadata) : '')} /></label>
             <label className="field"><span>Фамилия (род)</span><input name="family" maxLength={100} defaultValue={profile?.family_name ?? ''} /></label>
             <label className="field"><span>Страна</span><input name="country" maxLength={100} defaultValue={profile?.country ?? ''} /></label>
             <label className="field"><span>Город</span><input name="city" maxLength={120} defaultValue={profile?.city ?? ''} /></label>

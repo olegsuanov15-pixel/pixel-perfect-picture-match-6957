@@ -43,6 +43,13 @@
       "when": 1794993839676,
       "tag": "0005_validate_profiles_and_registration_consent",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794994614206,
+      "tag": "0006_verified_owner_admin",
+      "breakpoints": true
     }
   ]
 }

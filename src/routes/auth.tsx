@@ -1,15 +1,40 @@
-import { createFileRoute,Link } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState, type FormEvent } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { LovableMark } from '@lovable.dev/cloud-auth-js/react';
-import { lovable } from '@/integrations/lovable';
 import { Button } from '@/components/ui/button';
+import { GoogleButton, AuthDivider } from '@/components/ironkarta/google-button';
+import { useSocialLogin } from '@/hooks/use-social-login';
 import { useParticipant } from '@/hooks/use-participant';
+import { safeReturnPath } from '@/lib/auth-flow';
 import { pageHead } from '@/data/demo';
-export const Route=createFileRoute('/auth')({head:()=>pageHead('Вход','Вход участника для отправки отметок и проверки заявок.'),component:Auth});
-function Auth(){
- const {user}=useParticipant(); const [busy,setBusy]=useState(false); const [error,setError]=useState('');
- async function signIn(provider:'google'|'lovable'){setBusy(true);setError('');try{const result=await lovable.auth.signInWithOAuth(provider,{redirect_uri:`${window.location.origin}/auth`});if(result.error)setError('Не удалось войти. Попробуйте ещё раз.');}catch{setError('Не удалось войти. Попробуйте ещё раз.');}finally{setBusy(false);}}
- async function emailLogin(e:FormEvent<HTMLFormElement>){e.preventDefault();setBusy(true);setError('');const f=new FormData(e.currentTarget);const result=await supabase.auth.signInWithPassword({email:String(f.get('email')),password:String(f.get('password'))});if(result.error)setError('Неверный email или пароль');setBusy(false);}
- return <main className="page-main"><section className="prose-page max-w-md"><h1>Вход в Иронкарту</h1>{user?<><p>Вы вошли в аккаунт.</p><Button asChild><Link to="/profile">Мой профиль</Link></Button><Button asChild variant="outline" className="ml-2"><Link to="/">К карте</Link></Button></>:<div className="flex flex-col gap-3"><form onSubmit={emailLogin}><label className="field"><span>Email</span><input name="email" type="email" autoComplete="email" required/></label><label className="field"><span>Пароль</span><input name="password" type="password" autoComplete="current-password" required/></label><Button type="submit" className="w-full" disabled={busy}>Войти</Button></form><div className="flex justify-between gap-3"><Link to="/register">Регистрация</Link><Link to="/forgot-password">Забыли пароль?</Link></div><Button variant="outline" className="google-sign-in" disabled={busy} onClick={()=>signIn('google')}><svg aria-hidden="true" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.16-4.07 1.16-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.29c-.25-.72-.38-1.49-.38-2.29s.14-1.57.38-2.29V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.98-3.09z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.98 3.09c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>Продолжить с Google</Button><Button variant="outline" disabled={busy} onClick={()=>signIn('lovable')}><LovableMark/>Продолжить с Lovable</Button></div>}{error&&<p role="alert">{error}</p>}</section></main>;
+export const Route = createFileRoute('/auth')({
+  validateSearch: (search: Record<string, unknown>): { returnTo?: string | undefined } => ({ returnTo: safeReturnPath(search['returnTo']) }),
+  head: () => pageHead('Вход', 'Вход в Иронкарту через Google или email.'), component: Auth,
+});
+function Auth() {
+  const { user } = useParticipant();
+  const { returnTo } = Route.useSearch();
+  const social = useSocialLogin(returnTo ?? '/');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  async function emailLogin(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault(); setBusy(true); setError('');
+    try {
+      const f = new FormData(e.currentTarget);
+      const result = await supabase.auth.signInWithPassword({ email: String(f.get('email')), password: String(f.get('password')) });
+      if (result.error) setError('Неверный email или пароль');
+    } catch { setError('Не удалось войти. Попробуйте ещё раз.'); }
+    finally { setBusy(false); }
+  }
+  return <main className="page-main"><section className="prose-page max-w-md"><h1>Вход в Иронкарту</h1>
+    {user ? <><p>{social.busy ? 'Открываем профиль…' : 'Вы вошли в аккаунт.'}</p><Button asChild><Link to="/profile">Мой профиль</Link></Button><Button asChild variant="outline" className="ml-2"><Link to="/">К карте</Link></Button></> : <>
+      <GoogleButton busy={busy || social.busy} onClick={() => void social.signIn()} />
+      <AuthDivider />
+      <form onSubmit={emailLogin}><label className="field"><span>Email</span><input name="email" type="email" autoComplete="email" required /></label><label className="field"><span>Пароль</span><input name="password" type="password" autoComplete="current-password" required /></label><Button type="submit" className="w-full" disabled={busy || social.busy}>Войти</Button></form>
+      <div className="my-4 flex flex-wrap justify-between gap-3"><Link to="/register" search={{ returnTo }}>Регистрация</Link><Link to="/forgot-password">Забыли пароль?</Link></div>
+      <Button variant="outline" className="w-full" disabled={busy || social.busy} onClick={() => void social.signIn('lovable')}><LovableMark />Продолжить с Lovable</Button>
+    </>}
+    {(error || social.error) && <p role="alert">{error || social.error}</p>}
+  </section></main>;
 }

@@ -1,7 +1,7 @@
 import {createServerFn} from '@tanstack/react-start';
 import {getRequestHeader,getRequestIP} from '@tanstack/react-start/server';
 import {requireSupabaseAuth} from '@/integrations/supabase/auth-middleware';
-import {markSubmission,profileInput,canModerate,reviewInput} from './marks-rules';
+import {markSubmission,profileInput,reviewInput} from './marks-rules';
 import {z} from 'zod';
 export const submitMark=createServerFn({method:'POST'}).inputValidator((v:unknown)=>markSubmission.parse(v)).handler(async({data})=>{
  if(data.website)throw new Error('Не удалось отправить заявку');
@@ -17,10 +17,10 @@ export const submitMark=createServerFn({method:'POST'}).inputValidator((v:unknow
  return {saved:true,id:point.id,deleteToken:userId?null:point.guest_delete_token};
 });
 export const getParticipant=createServerFn({method:'GET'}).middleware([requireSupabaseAuth]).handler(async({context})=>{
- const [roles,profile,marks,consent]=await Promise.all([context.supabase.from('user_roles').select('role').eq('user_id',context.userId),context.supabase.from('profiles').select('display_name,avatar_path,family_name,country,city,about,show_on_map,processing_consent_at').eq('id',context.userId).maybeSingle(),context.supabase.from('map_points').select('id,country,city,status,moderation_note,families(name)').eq('user_id',context.userId).order('created_at',{ascending:false}),context.supabase.from('registration_consents').select('accepted_at').eq('user_id',context.userId).maybeSingle()]);
+ const [roles,profile,marks,consent]=await Promise.all([context.supabase.rpc('has_role',{_user_id:context.userId,_role:'admin'}),context.supabase.from('profiles').select('display_name,avatar_path,family_name,country,city,about,show_on_map,processing_consent_at').eq('id',context.userId).maybeSingle(),context.supabase.from('map_points').select('id,country,city,status,moderation_note,families(name)').eq('user_id',context.userId).order('created_at',{ascending:false}),context.supabase.from('registration_consents').select('accepted_at').eq('user_id',context.userId).maybeSingle()]);
  if(roles.error||profile.error||marks.error)throw new Error('Не удалось загрузить профиль');let avatarUrl:string|null=null;
  if(profile.data?.avatar_path){const {data}=await context.supabase.storage.from('participant-avatars').createSignedUrl(profile.data.avatar_path,600);avatarUrl=data?.signedUrl??null;}
- return {userId:context.userId,profile:profile.data,avatarUrl,moderator:canModerate((roles.data??[]).map(r=>r.role)),marks:marks.data,consented:Boolean(consent.data)};
+ return {userId:context.userId,profile:profile.data,avatarUrl,moderator:roles.data===true,marks:marks.data,consented:Boolean(consent.data)};
 });
 export const saveProfile=createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator((v:unknown)=>profileInput.parse(v)).handler(async({data,context})=>{
  if(data.avatarPath&&!data.avatarPath.startsWith(`${context.userId}/`))throw new Error('Недопустимое фото');

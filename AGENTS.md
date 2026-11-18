@@ -37,4 +37,6 @@ use the editor.
 - Public readers use the narrow public_map_points function, which exposes only approved city-level marks with consent and excludes hidden profiles; profile details and guest deletion capabilities remain private.
 - Geocode structured city/country components only through an authenticated admin action and cache centers; never accept participant coordinates or precise addresses.
 - Keep profile drafts in the edit form and await participant-query refresh before switching to the read-only view, so saved details and avatar stay current; mount toast notifications once in the root shell.
+- Complete managed OAuth only after session hydration, carrying a sanitized same-origin return path in sessionStorage; route empty profiles to editing with a Google-name draft rather than persisting unconfirmed profile details.
+- Grant automatic roles through verified-email auth lifecycle triggers and check admin via server-side has_role RPC, so client metadata cannot grant privileges.
 <!-- AGENT-MEMORY:END -->

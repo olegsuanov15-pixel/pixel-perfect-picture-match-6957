@@ -1,0 +1,8 @@
+CREATE OR REPLACE FUNCTION public.is_auto_admin_email(_email text, _confirmed boolean) RETURNS boolean LANGUAGE sql IMMUTABLE SECURITY INVOKER SET search_path=public AS $$ SELECT coalesce(_confirmed, false) AND lower(coalesce(_email, '')) = 'investgio7@gmail.com' $$;
+REVOKE ALL ON FUNCTION public.is_auto_admin_email(text, boolean) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.is_auto_admin_email(text, boolean) TO authenticated, service_role;
+CREATE OR REPLACE FUNCTION public.grant_verified_owner_admin() RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$ BEGIN IF public.is_auto_admin_email(NEW.email, NEW.email_confirmed_at IS NOT NULL) THEN INSERT INTO public.user_roles(user_id,role) VALUES(NEW.id,'admin') ON CONFLICT(user_id,role) DO NOTHING; END IF; RETURN NEW; END $$;
+REVOKE ALL ON FUNCTION public.grant_verified_owner_admin() FROM PUBLIC, anon, authenticated;
+CREATE TRIGGER verified_owner_admin_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.grant_verified_owner_admin();
+CREATE TRIGGER verified_owner_admin_confirmed AFTER UPDATE OF email_confirmed_at,email ON auth.users FOR EACH ROW EXECUTE FUNCTION public.grant_verified_owner_admin();
+INSERT INTO public.user_roles(user_id,role) SELECT id,'admin'::public.app_role FROM auth.users WHERE public.is_auto_admin_email(email,email_confirmed_at IS NOT NULL) ON CONFLICT(user_id,role) DO NOTHING;

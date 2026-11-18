@@ -375,6 +375,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_auto_admin_email: {
+        Args: { _confirmed: boolean; _email: string }
+        Returns: boolean
+      }
       public_map_points: {
         Args: never
         Returns: {
