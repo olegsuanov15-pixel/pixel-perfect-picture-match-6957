@@ -29,7 +29,9 @@ use the editor.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
 <!-- AGENT-MEMORY:BEGIN -->
-- Read catalog, history and approved marks from Cloud through public server functions and Query-backed loaders; keep the add-point form demonstrative until submission is requested.
+- Read public catalog through Query-backed loaders; submit participant marks as authenticated owner-scoped pending rows so no submission publishes directly.
+- Keep moderator roles in user_roles and validate them server-side and through RLS; record each pending-to-approved/rejected decision so public data cannot be changed by participants.
+- Keep profiles and avatar storage owner-private; signed-in pages live under the client-only authenticated layout because browser sessions are unavailable during SSR.
 - Share the header, mountain artwork and footer in the root shell; use separate content routes with individual metadata for discoverable navigation.
 - Render maps from simplified Natural Earth geometry and coordinate-positioned approved markers, so no map credentials or tile requests are needed.
 - Public readers use a publishable server client with RLS and explicit safe columns; require approved status and consent for marks and published source citations for history.

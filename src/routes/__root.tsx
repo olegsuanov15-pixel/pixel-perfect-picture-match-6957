@@ -8,7 +8,10 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import type { User } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
+import { ParticipantContext } from "@/hooks/use-participant";
 
 import appCss from "../styles.css?url";
 import { SiteHeader, SiteFooter } from "@/components/ironkarta/site-shell";
@@ -130,9 +133,24 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+      setReady(true);
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+        void router.invalidate();
+        if (event !== 'SIGNED_OUT') void queryClient.invalidateQueries();
+      }
+    });
+    return () => data.subscription.unsubscribe();
+  }, [queryClient, router]);
 
   return (
     <QueryClientProvider client={queryClient}>
+      <ParticipantContext.Provider value={{user,ready}}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <div className="site-shell">
         <img
@@ -146,6 +164,7 @@ function RootComponent() {
         <Outlet />
         <SiteFooter />
       </div>
+      </ParticipantContext.Provider>
     </QueryClientProvider>
   );
 }

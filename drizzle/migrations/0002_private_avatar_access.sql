@@ -1,0 +1,3 @@
+CREATE POLICY participant_avatar_read ON storage.objects FOR SELECT TO authenticated USING(bucket_id='participant-avatars' AND (storage.foldername(name))[1]=(select auth.uid())::text);
+CREATE POLICY participant_avatar_insert ON storage.objects FOR INSERT TO authenticated WITH CHECK(bucket_id='participant-avatars' AND (storage.foldername(name))[1]=(select auth.uid())::text AND lower(storage.extension(name)) IN ('jpg','jpeg','png','webp'));
+CREATE POLICY participant_avatar_delete ON storage.objects FOR DELETE TO authenticated USING(bucket_id='participant-avatars' AND (storage.foldername(name))[1]=(select auth.uid())::text);

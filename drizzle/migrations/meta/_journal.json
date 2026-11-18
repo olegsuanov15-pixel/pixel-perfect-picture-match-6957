@@ -8,6 +8,20 @@
       "when": 1794990645445,
       "tag": "0000_create_family_catalog_and_sources",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794993239657,
+      "tag": "0001_participant_submission_and_moderation",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794993253742,
+      "tag": "0002_private_avatar_access",
+      "breakpoints": true
     }
   ]
 }

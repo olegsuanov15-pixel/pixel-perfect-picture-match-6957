@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Heart, ArrowUpRight } from "lucide-react";
+import { useParticipant } from "@/hooks/use-participant";
 
 export function Ornament() {
   return (
@@ -21,6 +22,7 @@ export function Ornament() {
   );
 }
 export function SiteHeader() {
+  const {user}=useParticipant();
   return (
     <header className="site-header">
       <Link to="/" className="brand">
@@ -38,6 +40,7 @@ export function SiteHeader() {
         <Link to="/about" className="nav-link">
           О проекте
         </Link>
+        <Link to={user ? '/profile' : '/auth'} className="nav-link">{user ? 'Мой профиль' : 'Войти'}</Link>
       </nav>
       <span className="header-note">
         <Heart size={13} /> Из Осетии. С любовью.
