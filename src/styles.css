@@ -859,6 +859,24 @@ h1 {
 .family-entry .text-link {
   display: flex;
 }
+.family-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 20px;
+  padding: 24px 0 50px;
+}
+.family-results .family-entry { margin-top: 0; max-width: none; }
+.history-section { padding: 24px 0 30px; border-top: 1px solid var(--border); }
+.participant-section { padding: 25px 0; border-top: 1px solid var(--border); }
+.empty-copy { font-size: 13px; color: var(--muted-foreground); line-height: 1.9; margin: 15px 0 23px; }
+.history-article { padding: 20px 0; }
+.history-article h3 { font-size: 20px; font-weight: 700; }
+.history-body { white-space: pre-line; font-size: 14px; line-height: 1.9; margin: 15px 0; }
+.source-list { border-left: 3px solid var(--primary); padding-left: 18px; }
+.source-item { font-size: 12px; line-height: 1.8; padding: 12px 0; }
+.source-item p { color: var(--muted-foreground); }
+.history-body, .source-item, .family-entry h2 { overflow-wrap: anywhere; }
+.family-layout > *, .workspace > *, .search-wrap, .search-box input { min-width: 0; }
 .prose-page {
   max-width: 740px;
   padding-bottom: 65px;

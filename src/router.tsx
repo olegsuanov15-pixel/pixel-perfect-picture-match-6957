@@ -1,5 +1,6 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createRouter } from "@tanstack/react-router";
+import { DataError } from "./components/ironkarta/data-boundaries";
 import { routeTree } from "./routeTree.gen";
 
 export const getRouter = () => {
@@ -8,6 +9,7 @@ export const getRouter = () => {
 
   const router = createRouter({
     routeTree,
+    defaultErrorComponent: DataError,
     context: { queryClient },
     scrollRestoration: true,
     // Lets Query own freshness; set caching defaults on the QueryClient, not the router.

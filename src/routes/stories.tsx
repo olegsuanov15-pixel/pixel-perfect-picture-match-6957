@@ -1,15 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, MapPin } from "lucide-react";
 import { pageHead } from "@/data/demo";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { catalogQuery } from "@/lib/catalog-query";
+import { DataError, DataNotFound } from "@/components/ironkarta/data-boundaries";
 export const Route = createFileRoute("/stories")({
   head: () =>
     pageHead(
       "Истории фамилий",
       "Осетинские фамилии, семейные воспоминания и общие корни на Иронкарте.",
     ),
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(catalogQuery());
+  },
+  errorComponent: DataError,
+  notFoundComponent: DataNotFound,
   component: Stories,
 });
 function Stories() {
+  const { data } = useSuspenseQuery(catalogQuery());
   return (
     <main className="page-main">
       <section className="intro">
@@ -17,19 +26,17 @@ function Stories() {
         <h1>Истории фамилий</h1>
         <p>Наши фамилии — начало большого семейного рассказа.</p>
       </section>
-      <Link to="/family/suanovy" className="family-entry">
-        <h2>Суановы</h2>
-        <p>Одна фамилия. Разные города. Общие корни.</p>
-        <div className="inline-flex items-center gap-2 text-sm text-primary">
-          <MapPin size={15} />4 страны · 43 участника
-        </div>
-        <span className="text-link flex">
-          Открыть страницу фамилии <ArrowRight />
-        </span>
-      </Link>
-      <p className="demo-notice max-w-lg mb-16">
-        Первая демонстрационная страница. Исторические материалы пока не добавлены.
-      </p>
+      <section className="family-results">
+        {data.families.map((f) => (
+          <Link key={f.id} to="/family/$slug" params={{ slug: f.slug }} className="family-entry">
+            <h2>{f.name}</h2>
+            <p>История по источникам</p>
+            <span className="text-link">
+              Открыть страницу фамилии <ArrowRight />
+            </span>
+          </Link>
+        ))}
+      </section>
     </main>
   );
 }

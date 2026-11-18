@@ -2,20 +2,28 @@ import { useState } from "react";
 import { MapPin, Plus, Minus, Maximize } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import countries from "@/data/world.json";
-import { demoPoints, type DemoPoint } from "@/data/demo";
+export type MapPoint = {
+  id: string;
+  family: string;
+  slug: string;
+  country: string;
+  city: string | null;
+  latitude: number | null;
+  longitude: number | null;
+};
 
 export function WorldMap({
   selected = "barcelona",
   onSelect,
-  family,
+  points = [],
 }: {
   selected?: string;
-  onSelect?: (point: DemoPoint) => void;
-  family?: string;
+  onSelect?: (point: MapPoint) => void;
+  points?: MapPoint[];
 }) {
   const [zoom, setZoom] = useState(1);
   return (
-    <div className={`world-map zoom-${zoom}`} aria-label="Карта мира с демонстрационными отметками">
+    <div className={`world-map zoom-${zoom}`} aria-label="Карта мира с одобренными отметками">
       <div className="map-layer">
         <svg
           className="geography"
@@ -32,13 +40,17 @@ export function WorldMap({
         <span className="map-label label-asia">Азия</span>
         <span className="map-label label-africa">Африка</span>
         <span className="map-label label-oceania">Австралия</span>
-        {demoPoints
-          .filter((p) => !family || p.family === family)
+        {points
+          .filter((p) => p.latitude !== null && p.longitude !== null)
           .map((p) => (
             <Button
               key={p.id}
               variant="ghost"
-              className={`map-pin pin-${p.id} ${selected === p.id ? "is-selected" : ""}`}
+              className={`map-pin ${selected === p.id ? "is-selected" : ""}`}
+              style={{
+                left: `${(((p.longitude ?? 0) + 180) / 360) * 100}%`,
+                top: `${((85 - (p.latitude ?? 0)) / 145) * 100}%`,
+              }}
               aria-label={`${p.family}, ${p.city}`}
               onClick={() => onSelect?.(p)}
               title={`${p.family} · ${p.city}`}
@@ -84,9 +96,9 @@ export function WorldMap({
         </Button>
       </div>
       <div className="map-legend">
-        <MapPin /> {family ? "Отметки фамилии Суановы" : "Наши по всему миру"}
+        <MapPin /> Одобренные отметки
       </div>
-      <span className="map-credit">Границы: Natural Earth · демонстрационные отметки</span>
+      <span className="map-credit">Границы: Natural Earth</span>
     </div>
   );
 }

@@ -13,7 +13,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { WorldMap } from "@/components/ironkarta/world-map";
 import { AddPoint } from "@/components/ironkarta/add-point";
-import { demoPoints, pageHead } from "@/data/demo";
+import { pageHead } from "@/data/demo";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { catalogQuery } from "@/lib/catalog-query";
+import { DataError, DataNotFound } from "@/components/ironkarta/data-boundaries";
+import { SurnameSearch } from "@/components/ironkarta/surname-search";
 
 export const Route = createFileRoute("/")({
   validateSearch: (search: Record<string, unknown>): { point?: string } =>
@@ -23,20 +27,25 @@ export const Route = createFileRoute("/")({
       "Найди своих по всему миру",
       "Карта осетинских фамилий. Найдите своих, где бы вы ни были.",
     ),
+  loader: async ({ context }) => {
+    await context.queryClient.ensureQueryData(catalogQuery());
+  },
+  errorComponent: DataError,
+  notFoundComponent: DataNotFound,
   component: Index,
 });
 function Index() {
   const { point } = Route.useSearch();
-  const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState(
-    demoPoints.find((p) => p.id === point) ?? demoPoints[1],
-  );
+  const { data } = useSuspenseQuery(catalogQuery());
+  const points = data.marks.flatMap((mark) => {
+    const family = data.families.find((f) => f.id === mark.family_id);
+    return family ? [{ ...mark, family: family.name, slug: family.slug }] : [];
+  });
+  const [selectedId, setSelectedId] = useState(point ?? "");
+  const selected = points.find((p) => p.id === selectedId) ?? points[0];
   const [shared, setShared] = useState(false);
-  const results = [...new Set(demoPoints.map((p) => p.family))].filter((f) =>
-    f.toLocaleLowerCase("ru").includes(query.trim().toLocaleLowerCase("ru")),
-  );
-  const countriesCount = new Set(demoPoints.map((p) => p.country)).size;
-  const participants = demoPoints.reduce((n, p) => n + p.people, 0);
+  const countriesCount = new Set(points.map((p) => p.country)).size;
+  const participants = points.length;
   function focusForm() {
     document.getElementById("add-point")?.scrollIntoView({ behavior: "smooth", block: "center" });
     document.querySelector<HTMLInputElement>("#add-point input")?.focus({ preventScroll: true });
@@ -62,52 +71,18 @@ function Index() {
       <div className="workspace">
         <section>
           <div className="map-toolbar">
-            <div className="search-wrap">
-              <div className="search-box">
-                <Search />
-                <input
-                  aria-label="Поиск фамилии"
-                  placeholder="Введите фамилию…"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-              </div>
-              {query.trim() && (
-                <div className="search-results">
-                  {results.length ? (
-                    results.map((f) =>
-                      f === "Суановы" ? (
-                        <Link key={f} to="/family/suanovy">
-                          {f}
-                          <ArrowRight size={15} />
-                        </Link>
-                      ) : (
-                        <Button
-                          key={f}
-                          variant="ghost"
-                          className="w-full justify-start"
-                          onClick={() => {
-                            setSelected(demoPoints.find((p) => p.family === f));
-                            setQuery("");
-                          }}
-                        >
-                          {f}
-                        </Button>
-                      ),
-                    )
-                  ) : (
-                    <p>Такой фамилии пока нет на демо-карте.</p>
-                  )}
-                </div>
-              )}
-            </div>
+            <SurnameSearch />
             <Button variant="terra" className="h-12 px-5" onClick={focusForm}>
               <MapPin />
               Добавить свою точку
             </Button>
-            <span className="demo-tag">Демо-карта</span>
+            <span className="demo-tag">Одобренные отметки</span>
           </div>
-          <WorldMap selected={selected?.id ?? "barcelona"} onSelect={setSelected} />
+          <WorldMap
+            points={points}
+            selected={selected?.id ?? ""}
+            onSelect={(p) => setSelectedId(p.id)}
+          />
           <div className="map-bottom">
             <div className="map-stats">
               <div className="stat">
@@ -117,7 +92,7 @@ function Index() {
               </div>
               <div className="stat">
                 <MapPin />
-                <strong>{demoPoints.length}</strong>
+                <strong>{points.length}</strong>
                 <span>отметок</span>
               </div>
               <div className="stat">
@@ -134,7 +109,7 @@ function Index() {
           <section className="framed-tool selected-family">
             <div className="selected-top">
               <MapPin />
-              <h2>{selected?.family ?? "Суановы"}</h2>
+              <h2>{selected?.family ?? "Свои на карте"}</h2>
             </div>
             <div className="title-rule" />
             <p className="family-location">
@@ -146,18 +121,22 @@ function Index() {
                 <span>М</span>
                 <span>С</span>
               </div>
-              <span>{selected?.people} участников рядом</span>
+              <span>
+                {selected ? "Одобренная отметка участника" : "Одобренных отметок пока нет"}
+              </span>
             </div>
-            <Button className="w-full h-10" onClick={share}>
+            <Button className="w-full h-10" onClick={share} disabled={!selected}>
               {shared ? <Check /> : <Share2 />}
               {shared ? "Ссылка скопирована" : "Поделиться находкой"}
             </Button>
-            {selected?.family === "Суановы" ? (
-              <Link to="/family/suanovy" className="text-link">
+            {selected ? (
+              <Link to="/family/$slug" params={{ slug: selected.slug }} className="text-link">
                 История фамилии <ArrowRight />
               </Link>
             ) : (
-              <p>История этой фамилии ещё не добавлена.</p>
+              <Link to="/search" className="text-link">
+                Найти фамилию <ArrowRight />
+              </Link>
             )}
           </section>
         </aside>

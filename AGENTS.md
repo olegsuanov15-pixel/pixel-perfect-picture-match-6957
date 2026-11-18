@@ -29,7 +29,8 @@ use the editor.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
 <!-- AGENT-MEMORY:BEGIN -->
-- Keep the first-stage experience frontend-only with explicit demo data and non-persisting forms, so design review does not publish personal information.
+- Read catalog, history and approved marks from Cloud through public server functions and Query-backed loaders; keep the add-point form demonstrative until submission is requested.
 - Share the header, mountain artwork and footer in the root shell; use separate content routes with individual metadata for discoverable navigation.
-- Render the demonstration world map from simplified Natural Earth geometry and CSS-positioned markers, so it needs no map credentials or external tile requests.
+- Render maps from simplified Natural Earth geometry and coordinate-positioned approved markers, so no map credentials or tile requests are needed.
+- Public readers use a publishable server client with RLS and explicit safe columns; require approved status and consent for marks and published source citations for history.
 <!-- AGENT-MEMORY:END -->

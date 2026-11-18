@@ -51,7 +51,7 @@ export function SiteFooter() {
       <span>
         <span className="footer-brand">Иронкарта</span> · Связь, которая не знает границ
       </span>
-      <span>Демонстрационная версия · 2026</span>
+      <span>Иронкарта · 2026</span>
       <Link to="/about" className="inline-flex items-center gap-1">
         Сделано с любовью к своим <ArrowUpRight size={12} />
       </Link>

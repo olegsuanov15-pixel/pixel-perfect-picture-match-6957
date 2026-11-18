@@ -11,8 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as StoriesRouteImport } from './routes/stories'
-import { Route as FamilySuanovyRouteImport } from './routes/family.suanovy'
+import { Route as FamilySlugRouteImport } from './routes/family.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -24,49 +25,58 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StoriesRoute = StoriesRouteImport.update({
   id: '/stories',
   path: '/stories',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FamilySuanovyRoute = FamilySuanovyRouteImport.update({
-  id: '/family/suanovy',
-  path: '/family/suanovy',
+const FamilySlugRoute = FamilySlugRouteImport.update({
+  id: '/family/$slug',
+  path: '/family/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/search': typeof SearchRoute
   '/stories': typeof StoriesRoute
-  '/family/suanovy': typeof FamilySuanovyRoute
+  '/family/$slug': typeof FamilySlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/search': typeof SearchRoute
   '/stories': typeof StoriesRoute
-  '/family/suanovy': typeof FamilySuanovyRoute
+  '/family/$slug': typeof FamilySlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/search': typeof SearchRoute
   '/stories': typeof StoriesRoute
-  '/family/suanovy': typeof FamilySuanovyRoute
+  '/family/$slug': typeof FamilySlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/stories' | '/family/suanovy'
+  fullPaths: '/' | '/about' | '/search' | '/stories' | '/family/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/stories' | '/family/suanovy'
-  id: '__root__' | '/' | '/about' | '/stories' | '/family/suanovy'
+  to: '/' | '/about' | '/search' | '/stories' | '/family/$slug'
+  id: '__root__' | '/' | '/about' | '/search' | '/stories' | '/family/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  SearchRoute: typeof SearchRoute
   StoriesRoute: typeof StoriesRoute
-  FamilySuanovyRoute: typeof FamilySuanovyRoute
+  FamilySlugRoute: typeof FamilySlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -85,6 +95,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/stories': {
       id: '/stories'
       path: '/stories'
@@ -92,11 +109,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/family/suanovy': {
-      id: '/family/suanovy'
-      path: '/family/suanovy'
-      fullPath: '/family/suanovy'
-      preLoaderRoute: typeof FamilySuanovyRouteImport
+    '/family/$slug': {
+      id: '/family/$slug'
+      path: '/family/$slug'
+      fullPath: '/family/$slug'
+      preLoaderRoute: typeof FamilySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -105,8 +122,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  SearchRoute: SearchRoute,
   StoriesRoute: StoriesRoute,
-  FamilySuanovyRoute: FamilySuanovyRoute,
+  FamilySlugRoute: FamilySlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
