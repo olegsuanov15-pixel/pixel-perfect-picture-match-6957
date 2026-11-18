@@ -1390,6 +1390,9 @@ h1 {
 .map-app .pill-tabs svg { width: 14px; height: 14px; }
 .map-app .map-controls { z-index: 32; }
 .map-app .map-credit { left: 14px; right: auto; }
+.map-app .country { stroke: var(--hero-text); }
+.map-app .pill-tabs [aria-selected=false] { background: var(--paper); color: var(--foreground); }
+.map-app .app-search button { color: var(--foreground); }
 .sheet-statistics-line { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 5px 0 16px; color: var(--muted-foreground); font-size: 12px; white-space: nowrap; }
 .sheet-statistics-line > span { display: inline-flex; align-items: center; gap: 4px; }
 .sheet-statistics-line svg { width: 13px; height: 13px; color: var(--primary); }
